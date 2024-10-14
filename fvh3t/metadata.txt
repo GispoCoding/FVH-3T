@@ -1,5 +1,5 @@
 [general]
-name=FVH-3T
+name=Traffic Trajectory Toolkit
 description=
 about=
 version=0.1.0
