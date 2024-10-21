@@ -1,8 +1,11 @@
+import math
+
 from typing import NamedTuple
 
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsWkbTypes
 
 from fvh3t.core.gate import Gate
+
 
 class TrajectoryNode(NamedTuple):
     """
@@ -34,8 +37,27 @@ class Trajectory:
         return self.as_geometry().intersects(other.geometry())
 
     def average_speed(self) -> float:
-        # TODO: implement function
-        return 0.0
+        total_distance = 0.0
+        total_time = 0
+        for i in range(1, len(self.__nodes)):
+            current_node = self.__nodes[i]
+            previous_node = self.__nodes[i - 1]
+
+            distance = math.sqrt(
+                (current_node.point.x - previous_node.point.x) ** 2
+                + (current_node.point.y - previous_node.point.y) ** 2
+            )
+
+            time_difference = current_node.timestamp - previous_node.timestamp
+
+            total_distance += distance
+            total_time += time_difference
+
+        if total_time > 0:
+            return total_distance / total_time
+
+        else:
+            return 0.0
 
 
 class TrajectoryLayer:
