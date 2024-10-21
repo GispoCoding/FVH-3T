@@ -1,5 +1,6 @@
 from qgis.core import QgsGeometry
 
+
 class Gate:
     """
     A wrapper class around a QgsGeometry which represents a
@@ -12,4 +13,3 @@ class Gate:
 
     def geometry(self) -> QgsGeometry:
         return self.__geom
-
