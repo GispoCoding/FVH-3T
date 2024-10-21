@@ -1,4 +1,4 @@
-from typing import Tuple, NamedTuple
+from typing import NamedTuple
 
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsWkbTypes
 
@@ -24,8 +24,8 @@ class Trajectory:
     of nodes which have a location and a timestamp
     """
 
-    def __init__(self, nodes: Tuple[TrajectoryNode]) -> None:
-        self.__nodes: Tuple[TrajectoryNode] = nodes
+    def __init__(self, nodes: tuple[TrajectoryNode, ...]) -> None:
+        self.__nodes: tuple[TrajectoryNode, ...] = nodes
 
     def as_geometry(self) -> QgsGeometry:
         return QgsGeometry.fromPolylineXY([node.point for node in self.__nodes])

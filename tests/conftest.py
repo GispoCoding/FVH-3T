@@ -15,6 +15,7 @@ fixtures:
 """
 
 import pytest
+from fvh3t.core.gate import Gate
 
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 from qgis.core import QgsGeometry, QgsPointXY
@@ -25,4 +26,4 @@ def two_node_trajectory():
 
 @pytest.fixture
 def two_point_gate():
-    return QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)])
+    return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
