@@ -1,0 +1,68 @@
+# workflow name
+name: Tests
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the wanted branches
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  linux_tests:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: qgis/qgis:${{ matrix.qgis-image-tags }}
+    strategy:
+      matrix:
+        # Remove unsupported versions and add more versions. Use LTR version in the cov_tests job
+        qgis-image-tags: [release-3_28, release-3_34, latest]
+      fail-fast: false
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          apt update && apt install python3-venv -y
+          python3 -m venv --system-site-packages .venv
+          .venv/bin/python -m pip install -U setuptools pip
+          .venv/bin/pip install -r requirements-test.txt
+          .venv/bin/pip install .
+
+      - name: Run tests
+        env:
+          QGIS_PLUGIN_IN_CI: 1
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          .venv/bin/pytest
+
+  windows_tests:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Choco install qgis
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install qgis-ltr -y
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $env:QGIS_PATH = (Get-ChildItem "C:\Program Files\QGIS *\bin" | Select-Object -First 1 -ExpandProperty FullName)
+          $env:PATH="$env:QGIS_PATH;$env:PATH"
+          $env:QGIS_PLUGIN_IN_CI=1
+          python-qgis-ltr.bat -m pip install -qr requirements-test.txt
+          python-qgis-ltr.bat -m pip install .
+          python-qgis-ltr.bat -m pytest -v
+

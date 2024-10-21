@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 addopts = "-v"
+testpaths = "tests"
 
 [tool.coverage.report]
 omit = ["fvh3t/qgis_plugin_tools/*"]
