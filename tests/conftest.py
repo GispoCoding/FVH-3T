@@ -15,7 +15,8 @@ fixtures:
 """
 
 import pytest
-from qgis.core import QgsGeometry, QgsPointXY
+from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
+from qgis.PyQt.QtCore import QVariant
 
 from fvh3t.core.gate import Gate
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
@@ -29,3 +30,49 @@ def two_node_trajectory():
 @pytest.fixture
 def two_point_gate():
     return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
+
+
+@pytest.fixture
+def qgis_point_layer():
+    layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("id", QVariant.Int))
+    layer.addAttribute(QgsField("timestamp", QVariant.Int))
+
+    traj1_f1 = QgsFeature(layer.fields())
+    traj1_f1.setAttributes([1, 1000])
+    traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
+
+    traj1_f2 = QgsFeature(layer.fields())
+    traj1_f2.setAttributes([1, 2000])
+    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
+
+    traj1_f3 = QgsFeature(layer.fields())
+    traj1_f3.setAttributes([1, 3000])
+    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
+
+    traj2_f1 = QgsFeature(layer.fields())
+    traj2_f1.setAttributes([2, 5000])
+    traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 1)))
+
+    traj2_f2 = QgsFeature(layer.fields())
+    traj2_f2.setAttributes([2, 6000])
+    traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 2)))
+
+    traj2_f3 = QgsFeature(layer.fields())
+    traj2_f3.setAttributes([2, 7000])
+    traj2_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 3)))
+
+    layer.addFeature(traj1_f1)
+    layer.addFeature(traj1_f2)
+    layer.addFeature(traj1_f3)
+
+    layer.addFeature(traj2_f1)
+    layer.addFeature(traj2_f2)
+    layer.addFeature(traj2_f3)
+
+    layer.commitChanges()
+
+    return layer

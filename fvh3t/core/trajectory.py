@@ -4,13 +4,16 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 from qgis.core import (
     QgsExpression,
+    QgsFeature,
     QgsFeatureIterator,
     QgsFeatureRequest,
+    QgsField,
     QgsGeometry,
     QgsPointXY,
     QgsVectorLayer,
     QgsWkbTypes,
 )
+from qgis.PyQt.QtCore import QVariant
 
 if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
@@ -38,6 +41,9 @@ class Trajectory:
 
     def __init__(self, nodes: tuple[TrajectoryNode, ...]) -> None:
         self.__nodes: tuple[TrajectoryNode, ...] = nodes
+
+    def nodes(self) -> tuple[TrajectoryNode, ...]:
+        return self.__nodes
 
     def as_geometry(self) -> QgsGeometry:
         return QgsGeometry.fromPolylineXY([node.point for node in self.__nodes])
@@ -109,6 +115,32 @@ class TrajectoryLayer:
             trajectories.append(Trajectory(tuple(nodes)))
 
         self.__trajectories = tuple(trajectories)
+
+    def as_line_layer(self) -> QgsVectorLayer | None:
+        if not self.is_valid():
+            return None
+
+        # TODO: can this be a memory layer?
+        line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
+
+        line_layer.startEditing()
+
+        line_layer.addAttribute(QgsField("fid", QVariant.Int))
+        line_layer.addAttribute(QgsField("average_speed", QVariant.Double))
+
+        fields = line_layer.fields()
+
+        for i, trajectory in enumerate(self.__trajectories):
+            feature = QgsFeature(fields)
+
+            feature.setAttributes([i, trajectory.average_speed()])
+            feature.setGeometry(trajectory.as_geometry())
+
+            line_layer.addFeature(feature)
+
+        line_layer.commitChanges()
+
+        return line_layer
 
     def is_valid(self) -> bool:
         is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
