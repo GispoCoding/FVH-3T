@@ -1,8 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
-from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsWkbTypes
+from qgis.core import (
+    QgsExpression,
+    QgsFeatureIterator,
+    QgsFeatureRequest,
+    QgsGeometry,
+    QgsPointXY,
+    QgsVectorLayer,
+    QgsWkbTypes,
+)
 
 if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
@@ -56,6 +64,51 @@ class TrajectoryLayer:
         self.__layer: QgsVectorLayer = layer
         self.__id_field: str = id_field
         self.__timestamp_field: str = timestamp_field
+
+        # TODO: should the class of traveler be handled here?
+
+        self.__trajectories: tuple[Trajectory, ...] = ()
+
+    def layer(self) -> QgsVectorLayer:
+        return self.__layer
+
+    def id_field(self) -> str:
+        return self.__id_field
+
+    def timestamp_field(self) -> str:
+        return self.__timestamp_field
+
+    def trajectories(self) -> tuple[Trajectory, ...]:
+        return self.__trajectories
+
+    def create_trajectories(self) -> None:
+        if not self.is_valid():
+            return
+
+        id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
+        timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
+
+        unique_ids: set[Any] = self.__layer.uniqueValues(id_field_idx)
+
+        trajectories: list[Trajectory] = []
+
+        for identifier in unique_ids:
+            expression: QgsExpression = QgsExpression(f'"{self.__id_field}" = {identifier}')
+            features: QgsFeatureIterator = self.__layer.getFeatures(QgsFeatureRequest(expression))
+
+            nodes: list[TrajectoryNode] = []
+
+            for feature in features:
+                # TODO: Make sure we're actually getting a point
+                # from a point layer
+                point: QgsPointXY = feature.geometry().asPoint()
+                timestamp: int = feature[timestamp_field_idx]
+
+                nodes.append(TrajectoryNode(point, timestamp))
+
+            trajectories.append(Trajectory(tuple(nodes)))
+
+        self.__trajectories = tuple(trajectories)
 
     def is_valid(self) -> bool:
         is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
