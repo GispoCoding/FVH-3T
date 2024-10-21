@@ -2,6 +2,8 @@ from typing import Tuple, NamedTuple
 
 from qgis.core import QgsGeometry, QgsPointXY
 
+from fvh3t.core.gate import Gate
+
 class TrajectoryNode(NamedTuple):
     point: QgsPointXY
     timestamp: int
@@ -19,8 +21,8 @@ class Trajectory:
     def as_geometry(self) -> QgsGeometry:
         return QgsGeometry.fromPolylineXY([node.point for node in self.__nodes])
 
-    def intersects(self, other_geom: QgsGeometry) -> bool:
-        return self.as_geometry().intersects(other_geom)
+    def intersects_gate(self, other: Gate) -> bool:
+        return self.as_geometry().intersects(other.geometry())
 
     def average_speed(self) -> float:
         # TODO: implement function

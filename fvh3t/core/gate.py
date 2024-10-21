@@ -7,3 +7,4 @@ class Gate:
 
     def geometry(self) -> QgsGeometry:
         return self.__geom
+
