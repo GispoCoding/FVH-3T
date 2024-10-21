@@ -1,13 +1,10 @@
+-c requirements-test.txt
+
 # Debugging
 debugpy
 
 # Dependency maintenance
 pip-tools
-
-# Testing
-pytest
-pytest-cov
-pytest-qgis
 
 # Linting and formatting
 pre-commit
@@ -18,3 +15,5 @@ flake8-qgis
 
 # Stubs
 PyQt5-stubs
+
+-e file:.
