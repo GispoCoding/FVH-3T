@@ -105,8 +105,6 @@ class TrajectoryLayer:
             nodes: list[TrajectoryNode] = []
 
             for feature in features:
-                # TODO: Make sure we're actually getting a point
-                # from a point layer
                 point: QgsPointXY = feature.geometry().asPoint()
                 timestamp: int = feature[timestamp_field_idx]
 
