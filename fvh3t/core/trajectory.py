@@ -7,6 +7,7 @@ from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsWkbTypes
 if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
 
+
 class TrajectoryNode(NamedTuple):
     """
     A simple data container representing one node in a
