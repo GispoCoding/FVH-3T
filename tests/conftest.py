@@ -13,3 +13,17 @@ fixtures:
   This should be used with tests that add stuff to QgsProject.
 
 """
+
+import pytest
+from fvh3t.core.gate import Gate
+
+from fvh3t.core.trajectory import Trajectory, TrajectoryNode
+from qgis.core import QgsGeometry, QgsPointXY
+
+@pytest.fixture
+def two_node_trajectory():
+    return Trajectory((TrajectoryNode.from_coordinates(0, 0, 1000), TrajectoryNode.from_coordinates(0, 1, 2000)))
+
+@pytest.fixture
+def two_point_gate():
+    return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
