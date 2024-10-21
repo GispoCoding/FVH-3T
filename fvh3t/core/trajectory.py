@@ -43,10 +43,7 @@ class Trajectory:
             current_node = self.__nodes[i]
             previous_node = self.__nodes[i - 1]
 
-            distance = math.sqrt(
-                (current_node.point.x - previous_node.point.x) ** 2
-                + (current_node.point.y - previous_node.point.y) ** 2
-            )
+            distance = current_node.point.distance(previous_node.point)
 
             time_difference = current_node.timestamp - previous_node.timestamp
 
