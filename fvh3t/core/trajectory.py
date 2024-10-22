@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from math import log10
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransformContext,
+    QgsDistanceArea,
     QgsExpression,
     QgsFeature,
     QgsFeatureIterator,
     QgsFeatureRequest,
+    QgsFeatureSource,
     QgsField,
     QgsGeometry,
     QgsPointXY,
+    QgsUnitTypes,
     QgsVectorLayer,
     QgsWkbTypes,
 )
@@ -17,6 +23,13 @@ from qgis.PyQt.QtCore import QVariant
 
 if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
+
+
+UNIX_TIMESTAMP_UNIT_THRESHOLD = 13
+
+
+def digits_in_timestamp_int(num: int):
+    return int(log10(num)) + 1
 
 
 class TrajectoryNode(NamedTuple):
@@ -39,8 +52,9 @@ class Trajectory:
     of nodes which have a location and a timestamp
     """
 
-    def __init__(self, nodes: tuple[TrajectoryNode, ...]) -> None:
+    def __init__(self, nodes: tuple[TrajectoryNode, ...], layer: TrajectoryLayer | None = None) -> None:
         self.__nodes: tuple[TrajectoryNode, ...] = nodes
+        self.__layer: TrajectoryLayer | None = layer
 
     def nodes(self) -> tuple[TrajectoryNode, ...]:
         return self.__nodes
@@ -54,19 +68,39 @@ class Trajectory:
     def average_speed(self) -> float:
         total_distance = 0.0
         total_time = 0
+
+        da = QgsDistanceArea()
+        # TODO: Cartesian or ellipsoidal?
+
+        if self.__layer is not None:
+            da.setSourceCrs(self.__layer.crs(), QgsCoordinateTransformContext())
+        else:
+            da.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:3067"), QgsCoordinateTransformContext())
+
+        convert: bool = da.lengthUnits() != QgsUnitTypes.DistanceUnit.DistanceMeters
+
         for i in range(1, len(self.__nodes)):
             current_node = self.__nodes[i]
             previous_node = self.__nodes[i - 1]
 
-            distance = current_node.point.distance(previous_node.point)
+            distance = da.measureLine(current_node.point, previous_node.point)
+
+            if convert:
+                distance = da.convertLengthMeasurement(distance, QgsUnitTypes.DistanceUnit.DistanceMeters)
 
             time_difference = current_node.timestamp - previous_node.timestamp
 
             total_distance += distance
             total_time += time_difference
 
-        if total_time > 0:
-            return total_distance / total_time
+        # here the distance should've already been converted
+        # to meters and the time should've been converted
+        # to milliseconds
+        total_distance_km: float = total_distance / 1000
+        total_time_h: float = ((total_time / 1000) / 60) / 60
+
+        if total_time_h > 0:
+            return round((total_distance_km / total_time_h), 2)
 
         return 0.0
 
@@ -81,14 +115,42 @@ class TrajectoryLayer:
     3. has a valid timestamp field
     """
 
-    def __init__(self, layer: QgsVectorLayer, id_field: str, timestamp_field: str) -> None:
+    def __init__(
+        self,
+        layer: QgsVectorLayer,
+        id_field: str,
+        timestamp_field: str,
+        timestamp_unit: QgsUnitTypes.TemporalUnit = QgsUnitTypes.TemporalUnit.TemporalUnknownUnit,
+    ) -> None:
         self.__layer: QgsVectorLayer = layer
         self.__id_field: str = id_field
         self.__timestamp_field: str = timestamp_field
 
-        # TODO: should the class of traveler be handled here?
+        self.__map_units: QgsUnitTypes.DistanceUnit = QgsUnitTypes.DistanceUnit.DistanceUnknownUnit
+        self.__timestamp_units: QgsUnitTypes.TemporalUnit = timestamp_unit
+
+        if self.is_valid():
+            self.__map_units = self.__layer.crs().mapUnits()
+
+            if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalUnknownUnit:
+                first_feature = self.__layer.getFeature(1)
+
+                # TODO: ensure that this is a numeric field
+                # OR handle cases where it isn't
+                timestamp: int = first_feature.attribute(self.__timestamp_field)
+
+                # if a unix timestamp is in seconds and
+                # has 13 or more digits it is in year >= 33658
+                # so in this case let's assume that the
+                # timestamp is actually in milliseconds
+                if digits_in_timestamp_int(timestamp) >= UNIX_TIMESTAMP_UNIT_THRESHOLD:
+                    self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalMilliseconds
+                else:
+                    self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalSeconds
 
         self.__trajectories: tuple[Trajectory, ...] = ()
+
+        # TODO: should the class of traveler be handled here?
 
     def layer(self) -> QgsVectorLayer:
         return self.__layer
@@ -96,11 +158,20 @@ class TrajectoryLayer:
     def id_field(self) -> str:
         return self.__id_field
 
+    def map_units(self) -> QgsUnitTypes.DistanceUnit:
+        return self.__map_units
+
+    def timestamp_units(self) -> QgsUnitTypes.TemporalUnit:
+        return self.__timestamp_units
+
     def timestamp_field(self) -> str:
         return self.__timestamp_field
 
     def trajectories(self) -> tuple[Trajectory, ...]:
         return self.__trajectories
+
+    def crs(self) -> QgsCoordinateReferenceSystem:
+        return self.__layer.crs()
 
     def create_trajectories(self) -> None:
         if not self.is_valid():
@@ -130,9 +201,14 @@ class TrajectoryLayer:
                 point: QgsPointXY = feature.geometry().asPoint()
                 timestamp: int = feature[timestamp_field_idx]
 
+                if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalSeconds:
+                    # TODO: this means we're storing timestamps as milliseconds
+                    # We might want to use datetime or maybe convert to seconds?
+                    timestamp = timestamp * 1000
+
                 nodes.append(TrajectoryNode(point, timestamp))
 
-            trajectories.append(Trajectory(tuple(nodes)))
+            trajectories.append(Trajectory(tuple(nodes), self))
 
         self.__trajectories = tuple(trajectories)
 
@@ -163,8 +239,10 @@ class TrajectoryLayer:
         return line_layer
 
     def is_valid(self) -> bool:
+        is_layer_valid: bool = self.__layer.isValid()
         is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
+        has_features: bool = self.__layer.hasFeatures() == QgsFeatureSource.FeatureAvailability.FeaturesAvailable
         id_field_exists: bool = self.__layer.fields().indexFromName(self.__id_field) != -1
         timestamp_field_exists: bool = self.__layer.fields().indexFromName(self.__timestamp_field) != -1
 
-        return is_point_layer and id_field_exists and timestamp_field_exists
+        return is_layer_valid and is_point_layer and has_features and id_field_exists and timestamp_field_exists
