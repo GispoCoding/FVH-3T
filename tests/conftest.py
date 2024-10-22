@@ -24,16 +24,18 @@ from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 @pytest.fixture
 def two_node_trajectory():
-    return Trajectory((TrajectoryNode.from_coordinates(0, 0, 100), TrajectoryNode.from_coordinates(0, 1, 200)))
+    return Trajectory(
+        (TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1), TrajectoryNode.from_coordinates(0, 1, 200, 1, 1, 1))
+    )
 
 
 @pytest.fixture
 def three_node_trajectory():
     return Trajectory(
         (
-            TrajectoryNode.from_coordinates(0, 0, 100),
-            TrajectoryNode.from_coordinates(0, 1, 200),
-            TrajectoryNode.from_coordinates(0, 2, 300),
+            TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 1, 200, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 2, 300, 1, 1, 1),
         )
     )
 
@@ -42,9 +44,9 @@ def three_node_trajectory():
 def accelerating_three_node_trajectory():
     return Trajectory(
         (
-            TrajectoryNode.from_coordinates(0, 0, 100),
-            TrajectoryNode.from_coordinates(0, 1, 150),
-            TrajectoryNode.from_coordinates(0, 5, 300),
+            TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 1, 150, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 5, 300, 1, 1, 1),
         )
     )
 
