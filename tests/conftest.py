@@ -64,29 +64,32 @@ def qgis_point_layer():
 
     layer.addAttribute(QgsField("id", QVariant.Int))
     layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
 
     traj1_f1 = QgsFeature(layer.fields())
-    traj1_f1.setAttributes([1, 100])
+    traj1_f1.setAttributes([1, 100, 1, 1, 1])
     traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
 
     traj1_f2 = QgsFeature(layer.fields())
-    traj1_f2.setAttributes([1, 200])
+    traj1_f2.setAttributes([1, 200, 1, 1, 1])
     traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
 
     traj1_f3 = QgsFeature(layer.fields())
-    traj1_f3.setAttributes([1, 300])
+    traj1_f3.setAttributes([1, 300, 1, 1, 1])
     traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
 
     traj2_f1 = QgsFeature(layer.fields())
-    traj2_f1.setAttributes([2, 500])
+    traj2_f1.setAttributes([2, 500, 1, 1, 1])
     traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 1)))
 
     traj2_f2 = QgsFeature(layer.fields())
-    traj2_f2.setAttributes([2, 600])
+    traj2_f2.setAttributes([2, 600, 1, 1, 1])
     traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 2)))
 
     traj2_f3 = QgsFeature(layer.fields())
-    traj2_f3.setAttributes([2, 700])
+    traj2_f3.setAttributes([2, 700, 1, 1, 1])
     traj2_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 3)))
 
     layer.addFeature(traj1_f1)
@@ -110,17 +113,20 @@ def qgis_point_layer_non_ordered():
 
     layer.addAttribute(QgsField("id", QVariant.Int))
     layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
 
     traj1_f1 = QgsFeature(layer.fields())
-    traj1_f1.setAttributes([1, 3000])
+    traj1_f1.setAttributes([1, 3000, 1, 1, 1])
     traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
 
     traj1_f2 = QgsFeature(layer.fields())
-    traj1_f2.setAttributes([1, 6000])
+    traj1_f2.setAttributes([1, 6000, 1, 1, 1])
     traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
 
     traj1_f3 = QgsFeature(layer.fields())
-    traj1_f3.setAttributes([1, 1000])
+    traj1_f3.setAttributes([1, 1000, 1, 1, 1])
     traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
 
     layer.addFeature(traj1_f1)
