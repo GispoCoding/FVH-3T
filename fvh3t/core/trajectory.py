@@ -51,24 +51,44 @@ class Trajectory:
     def intersects_gate(self, other: Gate) -> bool:
         return self.as_geometry().intersects(other.geometry())
 
-    def average_speed(self) -> float:
+    def _movement_core(self) -> tuple[float, int, float]:
         total_distance = 0.0
         total_time = 0
-        for i in range(1, len(self.__nodes)):
-            current_node = self.__nodes[i]
-            previous_node = self.__nodes[i - 1]
+        max_speed = 0.0
+        nodes = self.nodes()
+        for i in range(1, len(nodes)):
+            current_node = nodes[i]
+            previous_node = nodes[i - 1]
 
             distance = current_node.point.distance(previous_node.point)
-
             time_difference = current_node.timestamp - previous_node.timestamp
+            speed = distance / time_difference
+            if speed > max_speed:
+                max_speed = speed
 
             total_distance += distance
             total_time += time_difference
 
+        return total_distance, total_time, max_speed
+
+    def maximum_speed(self) -> float:
+        _, _, max_speed = self._movement_core()
+        return round(max_speed, 2)
+
+    def average_speed(self) -> float:
+        total_distance, total_time, _ = self._movement_core()
         if total_time > 0:
-            return total_distance / total_time
+            return round(total_distance / total_time, 2)
 
         return 0.0
+
+    def length(self) -> float:
+        length, _, _ = self._movement_core()
+        return round(length, 2)
+
+    def duration(self) -> int:
+        _, duration, _ = self._movement_core()
+        return duration
 
 
 class TrajectoryLayer:
