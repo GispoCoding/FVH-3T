@@ -1,10 +1,12 @@
-import math
+from __future__ import annotations
 
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsWkbTypes
 
-from fvh3t.core.gate import Gate
+if TYPE_CHECKING:
+    from fvh3t.core.gate import Gate
+
 
 
 class TrajectoryNode(NamedTuple):

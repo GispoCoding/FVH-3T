@@ -1,6 +1,7 @@
-from fvh3t.core.trajectory import Trajectory
-from fvh3t.core.gate import Gate
 from qgis.core import QgsGeometry, QgsPointXY
+
+from fvh3t.core.gate import Gate
+from fvh3t.core.trajectory import Trajectory
 
 
 def test_trajectory_as_geometry(two_node_trajectory: Trajectory) -> None:

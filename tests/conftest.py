@@ -15,10 +15,11 @@ fixtures:
 """
 
 import pytest
-from fvh3t.core.gate import Gate
-
-from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 from qgis.core import QgsGeometry, QgsPointXY
+
+from fvh3t.core.gate import Gate
+from fvh3t.core.trajectory import Trajectory, TrajectoryNode
+
 
 
 @pytest.fixture
