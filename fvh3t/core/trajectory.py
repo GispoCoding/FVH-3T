@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
 
 
-
 class TrajectoryNode(NamedTuple):
     """
     A simple data container representing one node in a
@@ -55,8 +54,7 @@ class Trajectory:
         if total_time > 0:
             return total_distance / total_time
 
-        else:
-            return 0.0
+        return 0.0
 
 
 class TrajectoryLayer:
