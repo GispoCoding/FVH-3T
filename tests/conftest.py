@@ -87,3 +87,33 @@ def qgis_point_layer():
     layer.commitChanges()
 
     return layer
+
+
+@pytest.fixture
+def qgis_point_layer_non_ordered():
+    layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("id", QVariant.Int))
+    layer.addAttribute(QgsField("timestamp", QVariant.Int))
+
+    traj1_f1 = QgsFeature(layer.fields())
+    traj1_f1.setAttributes([1, 3000])
+    traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
+
+    traj1_f2 = QgsFeature(layer.fields())
+    traj1_f2.setAttributes([1, 6000])
+    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
+
+    traj1_f3 = QgsFeature(layer.fields())
+    traj1_f3.setAttributes([1, 1000])
+    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
+
+    layer.addFeature(traj1_f1)
+    layer.addFeature(traj1_f2)
+    layer.addFeature(traj1_f3)
+
+    layer.commitChanges()
+
+    return layer

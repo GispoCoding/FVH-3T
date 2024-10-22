@@ -114,8 +114,15 @@ class TrajectoryLayer:
         trajectories: list[Trajectory] = []
 
         for identifier in unique_ids:
-            expression: QgsExpression = QgsExpression(f'"{self.__id_field}" = {identifier}')
-            features: QgsFeatureIterator = self.__layer.getFeatures(QgsFeatureRequest(expression))
+            expression = QgsExpression(f'"{self.__id_field}" = {identifier}')
+            request = QgsFeatureRequest(expression)
+
+            order_clause = QgsFeatureRequest.OrderByClause(self.__timestamp_field, ascending=True)
+            order_by = QgsFeatureRequest.OrderBy([order_clause])
+
+            request.setOrderBy(order_by)
+
+            features: QgsFeatureIterator = self.__layer.getFeatures(request)
 
             nodes: list[TrajectoryNode] = []
 

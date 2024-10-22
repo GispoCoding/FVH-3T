@@ -66,6 +66,23 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     assert feat2.attribute("average_speed") == 0.001
 
 
+def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
+    traj_layer = TrajectoryLayer(qgis_point_layer_non_ordered, "id", "timestamp")
+    traj_layer.create_trajectories()
+
+    trajectories = traj_layer.trajectories()
+
+    assert len(trajectories) == 1
+
+    nodes = trajectories[0].nodes()
+
+    assert len(nodes) == 3
+
+    assert nodes[0].timestamp == 1000
+    assert nodes[1].timestamp == 3000
+    assert nodes[2].timestamp == 6000
+
+
 def test_trajectory_average_speed(two_node_trajectory: Trajectory, three_node_trajectory: Trajectory):
     assert two_node_trajectory.average_speed() == 0.001
     assert three_node_trajectory.average_speed() == 0.001
