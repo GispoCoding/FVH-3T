@@ -28,6 +28,17 @@ def two_node_trajectory():
 
 
 @pytest.fixture
+def three_node_trajectory():
+    return Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 1000),
+            TrajectoryNode.from_coordinates(0, 1, 2000),
+            TrajectoryNode.from_coordinates(0, 2, 3000),
+        )
+    )
+
+
+@pytest.fixture
 def two_point_gate():
     return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
 

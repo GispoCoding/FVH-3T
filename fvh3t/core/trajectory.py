@@ -52,7 +52,22 @@ class Trajectory:
         return self.as_geometry().intersects(other.geometry())
 
     def average_speed(self) -> float:
-        # TODO: implement function
+        total_distance = 0.0
+        total_time = 0
+        for i in range(1, len(self.__nodes)):
+            current_node = self.__nodes[i]
+            previous_node = self.__nodes[i - 1]
+
+            distance = current_node.point.distance(previous_node.point)
+
+            time_difference = current_node.timestamp - previous_node.timestamp
+
+            total_distance += distance
+            total_time += time_difference
+
+        if total_time > 0:
+            return total_distance / total_time
+
         return 0.0
 
 
