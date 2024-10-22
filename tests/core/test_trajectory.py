@@ -62,9 +62,8 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     assert feat1.geometry().asWkt() == "LineString (0 0, 1 0, 2 0)"
     assert feat2.geometry().asWkt() == "LineString (5 1, 5 2, 5 3)"
 
-    # FIXME: change when average_speed is implemented
-    assert feat1.attribute("average_speed") == 0.0
-    assert feat2.attribute("average_speed") == 0.0
+    assert feat1.attribute("average_speed") == 0.001
+    assert feat2.attribute("average_speed") == 0.001
 
 
 def test_trajectory_average_speed(two_node_trajectory: Trajectory, three_node_trajectory: Trajectory):
