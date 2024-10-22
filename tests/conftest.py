@@ -21,9 +21,21 @@ from fvh3t.core.gate import Gate
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 
+
 @pytest.fixture
 def two_node_trajectory():
     return Trajectory((TrajectoryNode.from_coordinates(0, 0, 1000), TrajectoryNode.from_coordinates(0, 1, 2000)))
+
+
+@pytest.fixture
+def three_node_trajectory():
+    return Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 1000),
+            TrajectoryNode.from_coordinates(0, 1, 2000),
+            TrajectoryNode.from_coordinates(0, 2, 3000),
+        )
+    )
 
 
 @pytest.fixture

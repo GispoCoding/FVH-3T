@@ -17,3 +17,8 @@ def test_trajectory_intersects_gate(two_node_trajectory):
 
     assert two_node_trajectory.intersects_gate(gate1)
     assert not two_node_trajectory.intersects_gate(gate2)
+
+
+def test_trajectory_average_speed(two_node_trajectory: Trajectory, three_node_trajectory: Trajectory):
+    assert two_node_trajectory.average_speed() == 0.001
+    assert three_node_trajectory.average_speed() == 0.001
