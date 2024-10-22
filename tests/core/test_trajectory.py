@@ -20,7 +20,7 @@ def test_trajectory_intersects_gate(two_node_trajectory):
 
 
 def test_trajectory_layer_create_trajectories(qgis_point_layer):
-    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     trajectories: tuple[Trajectory, ...] = traj_layer.trajectories()
@@ -48,7 +48,7 @@ def test_trajectory_layer_create_trajectories(qgis_point_layer):
 
 
 def test_trajectory_layer_create_line_layer(qgis_point_layer):
-    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     line_layer = traj_layer.as_line_layer()
@@ -67,7 +67,7 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
 
 
 def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
-    traj_layer = TrajectoryLayer(qgis_point_layer_non_ordered, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer_non_ordered, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     trajectories = traj_layer.trajectories()
