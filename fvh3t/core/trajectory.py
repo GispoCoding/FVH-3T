@@ -73,15 +73,15 @@ class Trajectory:
         total_distance = 0.0
         total_time = 0
         max_speed = 0.0
-        
+
         da = QgsDistanceArea()
-        
+
         if self.__layer is not None:
             da.setSourceCrs(self.__layer.crs(), QgsCoordinateTransformContext())
         else:
             da.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:3067"), QgsCoordinateTransformContext())
-            
-        convert: bool = da.lengthUnits() != QgsUnitTypes.DistanceUnit.DistanceMeteres
+
+        convert: bool = da.lengthUnits() != QgsUnitTypes.DistanceUnit.DistanceMeters
 
         for i in range(1, len(self.__nodes)):
             current_node = self.__nodes[i]
@@ -90,13 +90,13 @@ class Trajectory:
             distance = da.measureLine(current_node.point, previous_node.point)
             if convert:
                 distance = da.convertLengthMeasurement(distance, QgsUnitTypes.DistanceUnit.DistanceMeters)
-            
+
             time_difference = current_node.timestamp - previous_node.timestamp
             speed = distance / time_difference
-            
+
             if speed > max_speed:
                 max_speed = speed
-                
+
             total_distance += distance
             total_time += time_difference
 
@@ -106,7 +106,7 @@ class Trajectory:
         # here the max speed is in meters / millisecond
         # convert to km/h
         _, _, max_speed = self._movement_core()
-        
+
         max_speed = max_speed * 3600
         return round(max_speed, 2)
 
@@ -291,7 +291,6 @@ class TrajectoryLayer:
                     # TODO: this means we're storing timestamps as milliseconds
                     # We might want to use datetime or maybe convert to seconds?
                     timestamp = timestamp * 1000
-
 
                 nodes.append(TrajectoryNode(point, timestamp, width, length, height))
 
