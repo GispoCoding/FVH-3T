@@ -147,3 +147,50 @@ def qgis_point_layer_non_ordered():
     layer.commitChanges()
 
     return layer
+
+
+@pytest.fixture
+def qgis_vector_layer():
+    return QgsVectorLayer()
+
+
+@pytest.fixture
+def qgis_line_layer():
+    return QgsVectorLayer("LineString?crs=EPSG:3067", "Line Layer", "memory")
+
+
+@pytest.fixture
+def qgis_point_layer_no_features():
+    return QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+
+@pytest.fixture
+def qgis_point_layer_no_additional_fields():
+    layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
+
+    traj1_f1 = QgsFeature(layer.fields())
+    traj1_f1.setAttributes([3000, 1, 1, 1])
+    traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
+
+    traj1_f2 = QgsFeature(layer.fields())
+    traj1_f2.setAttributes([6000, 1, 1, 1])
+    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
+
+    traj1_f3 = QgsFeature(layer.fields())
+    traj1_f3.setAttributes([1000, 1, 1, 1])
+    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
+
+    layer.addFeature(traj1_f1)
+    layer.addFeature(traj1_f2)
+    layer.addFeature(traj1_f3)
+
+    layer.commitChanges()
+
+    return layer

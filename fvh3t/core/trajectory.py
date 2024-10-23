@@ -339,21 +339,43 @@ class TrajectoryLayer:
 
     def is_valid(self) -> bool:
         is_layer_valid: bool = self.__layer.isValid()
-        is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
-        has_features: bool = self.__layer.hasFeatures() == QgsFeatureSource.FeatureAvailability.FeaturesAvailable
-        id_field_exists: bool = self.__layer.fields().indexFromName(self.__id_field) != -1
-        timestamp_field_exists: bool = self.__layer.fields().indexFromName(self.__timestamp_field) != -1
-        width_field_exists: bool = self.__layer.fields().indexFromName(self.__width_field) != -1
-        length_field_exists: bool = self.__layer.fields().indexFromName(self.__length_field) != -1
-        height_field_exists: bool = self.__layer.fields().indexFromName(self.__height_field) != -1
+        if not is_layer_valid:
+            msg = "Layer is not valid."
+            raise ValueError(msg)
 
-        return (
-            is_layer_valid
-            and is_point_layer
-            and has_features
-            and id_field_exists
-            and timestamp_field_exists
-            and width_field_exists
-            and length_field_exists
-            and height_field_exists
-        )
+        is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
+        if not is_point_layer:
+            msg = "Layer is not a point layer."
+            raise ValueError(msg)
+
+        has_features: bool = self.__layer.hasFeatures() == QgsFeatureSource.FeatureAvailability.FeaturesAvailable
+        if not has_features:
+            msg = "Layer has no features."
+            raise ValueError(msg)
+
+        id_field_exists: bool = self.__layer.fields().indexFromName(self.__id_field) != -1
+        if not id_field_exists:
+            msg = "Id field not found in the layer."
+            raise ValueError(msg)
+
+        timestamp_field_exists: bool = self.__layer.fields().indexFromName(self.__timestamp_field) != -1
+        if not timestamp_field_exists:
+            msg = "Timestamp field not found in the layer."
+            raise ValueError(msg)
+
+        width_field_exists: bool = self.__layer.fields().indexFromName(self.__width_field) != -1
+        if not width_field_exists:
+            msg = "Width field not found in the layer."
+            raise ValueError(msg)
+
+        length_field_exists: bool = self.__layer.fields().indexFromName(self.__length_field) != -1
+        if not length_field_exists:
+            msg = "Length field not found in the layer."
+            raise ValueError(msg)
+
+        height_field_exists: bool = self.__layer.fields().indexFromName(self.__height_field) != -1
+        if not height_field_exists:
+            msg = "Height field not found in the layer."
+            raise ValueError(msg)
+
+        return True
