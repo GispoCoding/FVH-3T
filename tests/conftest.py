@@ -74,7 +74,7 @@ def qgis_point_layer():
     layer.startEditing()
 
     layer.addAttribute(QgsField("id", QVariant.Int))
-    layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("timestamp", QVariant.Double))
     layer.addAttribute(QgsField("width", QVariant.Int))
     layer.addAttribute(QgsField("length", QVariant.Int))
     layer.addAttribute(QgsField("height", QVariant.Int))
