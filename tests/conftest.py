@@ -24,16 +24,40 @@ from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 @pytest.fixture
 def two_node_trajectory():
-    return Trajectory((TrajectoryNode.from_coordinates(0, 0, 1000), TrajectoryNode.from_coordinates(0, 1, 2000)))
+    return Trajectory(
+        (TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1), TrajectoryNode.from_coordinates(0, 1, 200, 1, 1, 1))
+    )
 
 
 @pytest.fixture
 def three_node_trajectory():
     return Trajectory(
         (
-            TrajectoryNode.from_coordinates(0, 0, 1000),
-            TrajectoryNode.from_coordinates(0, 1, 2000),
-            TrajectoryNode.from_coordinates(0, 2, 3000),
+            TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 1, 200, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 2, 300, 1, 1, 1),
+        )
+    )
+
+
+@pytest.fixture
+def accelerating_three_node_trajectory():
+    return Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 1, 150, 1, 1, 1),
+            TrajectoryNode.from_coordinates(0, 5, 300, 1, 1, 1),
+        )
+    )
+
+
+@pytest.fixture
+def size_changing_trajectory():
+    return Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 100, 0.5, 0.5, 0.5),
+            TrajectoryNode.from_coordinates(0, 1, 200, 0.51, 0.51, 0.51),
+            TrajectoryNode.from_coordinates(0, 2, 300, 0.49, 0.49, 0.49),
         )
     )
 
@@ -51,29 +75,32 @@ def qgis_point_layer():
 
     layer.addAttribute(QgsField("id", QVariant.Int))
     layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
 
     traj1_f1 = QgsFeature(layer.fields())
-    traj1_f1.setAttributes([1, 1000])
+    traj1_f1.setAttributes([1, 100, 1, 1, 1])
     traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
 
     traj1_f2 = QgsFeature(layer.fields())
-    traj1_f2.setAttributes([1, 2000])
+    traj1_f2.setAttributes([1, 200, 1, 1, 1])
     traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
 
     traj1_f3 = QgsFeature(layer.fields())
-    traj1_f3.setAttributes([1, 3000])
+    traj1_f3.setAttributes([1, 300, 1, 1, 1])
     traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
 
     traj2_f1 = QgsFeature(layer.fields())
-    traj2_f1.setAttributes([2, 5000])
+    traj2_f1.setAttributes([2, 500, 1, 1, 1])
     traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 1)))
 
     traj2_f2 = QgsFeature(layer.fields())
-    traj2_f2.setAttributes([2, 6000])
+    traj2_f2.setAttributes([2, 600, 1, 1, 1])
     traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 2)))
 
     traj2_f3 = QgsFeature(layer.fields())
-    traj2_f3.setAttributes([2, 7000])
+    traj2_f3.setAttributes([2, 700, 1, 1, 1])
     traj2_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5, 3)))
 
     layer.addFeature(traj1_f1)
@@ -97,17 +124,20 @@ def qgis_point_layer_non_ordered():
 
     layer.addAttribute(QgsField("id", QVariant.Int))
     layer.addAttribute(QgsField("timestamp", QVariant.Int))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
 
     traj1_f1 = QgsFeature(layer.fields())
-    traj1_f1.setAttributes([1, 3000])
+    traj1_f1.setAttributes([1, 3000, 1, 1, 1])
     traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
 
     traj1_f2 = QgsFeature(layer.fields())
-    traj1_f2.setAttributes([1, 6000])
+    traj1_f2.setAttributes([1, 6000, 1, 1, 1])
     traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
 
     traj1_f3 = QgsFeature(layer.fields())
-    traj1_f3.setAttributes([1, 1000])
+    traj1_f3.setAttributes([1, 1000, 1, 1, 1])
     traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
 
     layer.addFeature(traj1_f1)
