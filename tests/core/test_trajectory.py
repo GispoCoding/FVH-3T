@@ -97,3 +97,15 @@ def test_trajectory_length(three_node_trajectory: Trajectory):
 
 def test_trajectory_duration(three_node_trajectory: Trajectory):
     assert three_node_trajectory.duration() == 200
+
+
+def test_trajectory_minimum_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.minimum_size() == (0.49, 0.49, 0.49)
+
+
+def test_trajectory_maximum_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.maximum_size() == (0.51, 0.51, 0.51)
+
+
+def test_trajectory_average_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.average_size() == (0.50, 0.50, 0.50)

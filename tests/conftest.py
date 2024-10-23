@@ -52,6 +52,17 @@ def accelerating_three_node_trajectory():
 
 
 @pytest.fixture
+def size_changing_trajectory():
+    return Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 100, 0.5, 0.5, 0.5),
+            TrajectoryNode.from_coordinates(0, 1, 200, 0.51, 0.51, 0.51),
+            TrajectoryNode.from_coordinates(0, 2, 300, 0.49, 0.49, 0.49),
+        )
+    )
+
+
+@pytest.fixture
 def two_point_gate():
     return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
 
