@@ -1,3 +1,4 @@
+import pytest
 from qgis.core import QgsGeometry, QgsPointXY, QgsUnitTypes
 
 from fvh3t.core.gate import Gate
@@ -122,3 +123,55 @@ def test_trajectory_maximum_size(size_changing_trajectory: Trajectory):
 
 def test_trajectory_average_size(size_changing_trajectory: Trajectory):
     assert size_changing_trajectory.average_size() == (0.50, 0.50, 0.50)
+
+
+def test_is_valid_is_layer_valid(qgis_vector_layer):
+    with pytest.raises(ValueError, match="Layer is not valid."):
+        TrajectoryLayer(
+            qgis_vector_layer,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
+
+
+def test_is_valid_is_point_layer(qgis_line_layer):
+    with pytest.raises(ValueError, match="Layer is not a point layer."):
+        TrajectoryLayer(
+            qgis_line_layer,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
+
+
+def test_is_valid_has_features(qgis_point_layer_no_features):
+    with pytest.raises(ValueError, match="Layer has no features."):
+        TrajectoryLayer(
+            qgis_point_layer_no_features,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
+
+
+def test_is_valid_id_field_exists(qgis_point_layer_no_additional_fields):
+    with pytest.raises(ValueError, match="Id field not found in the layer."):
+        TrajectoryLayer(
+            qgis_point_layer_no_additional_fields,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
