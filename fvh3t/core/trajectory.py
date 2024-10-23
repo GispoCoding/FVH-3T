@@ -55,13 +55,13 @@ class TrajectoryNode(NamedTuple):
         length: float,
         height: float,
         *,
-        timestamp_in_milliseconds: bool = True,
+        timestamp_in_ms: bool = True,
     ):
         if type(timestamp) is int:
             timestamp = float(timestamp)
 
         if type(timestamp) is float:
-            if timestamp_in_milliseconds:
+            if timestamp_in_ms:
                 timestamp = timestamp / 1000
 
             final_timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
