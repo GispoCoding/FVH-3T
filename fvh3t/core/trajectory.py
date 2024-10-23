@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from math import log10
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -39,14 +40,27 @@ class TrajectoryNode(NamedTuple):
     """
 
     point: QgsPointXY
-    timestamp: int
+    timestamp: datetime
     width: float
     length: float
     height: float
 
     @classmethod
-    def from_coordinates(cls, x: float, y: float, timestamp: int, width: float, length: float, height: float):
-        return cls(QgsPointXY(x, y), timestamp, width, length, height)
+    def from_coordinates(
+        cls,
+        x: float,
+        y: float,
+        timestamp: float,
+        width: float,
+        length: float,
+        height: float,
+        *,
+        timestamp_in_ms: bool = True,
+    ):
+        if timestamp_in_ms:
+            timestamp = timestamp / 1000
+
+        return cls(QgsPointXY(x, y), datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
 
 
 class Trajectory:
@@ -69,10 +83,10 @@ class Trajectory:
     def intersects_gate(self, other: Gate) -> bool:
         return self.as_geometry().intersects(other.geometry())
 
-    def _movement_core(self) -> tuple[float, int, float]:
-        total_distance = 0.0
-        total_time = 0
-        max_speed = 0.0
+    def _movement_core(self) -> tuple[float, timedelta, float]:
+        total_distance_m = 0.0
+        total_time_s = timedelta(0)
+        max_speed_m_per_s = 0.0
 
         da = QgsDistanceArea()
 
@@ -84,43 +98,42 @@ class Trajectory:
         convert: bool = da.lengthUnits() != QgsUnitTypes.DistanceUnit.DistanceMeters
 
         for i in range(1, len(self.__nodes)):
-            current_node = self.__nodes[i]
-            previous_node = self.__nodes[i - 1]
+            current_node: TrajectoryNode = self.__nodes[i]
+            previous_node: TrajectoryNode = self.__nodes[i - 1]
 
-            distance = da.measureLine(current_node.point, previous_node.point)
+            distance_m: float = da.measureLine(current_node.point, previous_node.point)
             if convert:
-                distance = da.convertLengthMeasurement(distance, QgsUnitTypes.DistanceUnit.DistanceMeters)
+                distance_m = da.convertLengthMeasurement(distance_m, QgsUnitTypes.DistanceUnit.DistanceMeters)
 
-            time_difference = current_node.timestamp - previous_node.timestamp
-            speed = distance / time_difference
+            time_difference: timedelta = current_node.timestamp - previous_node.timestamp
+            speed_s: float = distance_m / time_difference.total_seconds()
 
-            if speed > max_speed:
-                max_speed = speed
+            if speed_s > max_speed_m_per_s:
+                max_speed_m_per_s = speed_s
 
-            total_distance += distance
-            total_time += time_difference
+            total_distance_m += distance_m
+            total_time_s += time_difference
 
-        return total_distance, total_time, max_speed
+        return total_distance_m, total_time_s, max_speed_m_per_s
 
     def maximum_speed(self) -> float:
-        # here the max speed is in meters / millisecond
+        # here the max speed is in meters / second
         # convert to km/h
         _, _, max_speed = self._movement_core()
 
-        max_speed = max_speed * 3600
+        max_speed = max_speed * 3.6
         return round(max_speed, 2)
 
     def average_speed(self) -> float:
-        total_distance, total_time, _ = self._movement_core()
+        total_distance_m, total_time_s, _ = self._movement_core()
+        seconds: float = total_time_s.total_seconds()
 
-        # here the distance should've already been converted
-        # to meters and the time is in milliseconds
-        # convert to kilometers and hours respectively
-        total_distance_km: float = total_distance / 1000
-        total_time_h: float = ((total_time / 1000) / 60) / 60
+        # calculate m/s
+        if seconds > 0:
+            meters_per_second = total_distance_m / seconds
 
-        if total_time_h > 0:
-            return round((total_distance_km / total_time_h), 2)
+            # calculate and return in km/h
+            return round(meters_per_second * 3.6, 2)
 
         return 0.0
 
@@ -128,7 +141,7 @@ class Trajectory:
         length, _, _ = self._movement_core()
         return round(length, 2)
 
-    def duration(self) -> int:
+    def duration(self) -> timedelta:
         _, duration, _ = self._movement_core()
         return duration
 
@@ -282,17 +295,17 @@ class TrajectoryLayer:
 
             for feature in features:
                 point: QgsPointXY = feature.geometry().asPoint()
-                timestamp: int = feature[timestamp_field_idx]
+                timestamp: float = feature[timestamp_field_idx]
                 width: int = feature[width_field_idx]
                 length: int = feature[length_field_idx]
                 height: int = feature[height_field_idx]
 
-                if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalSeconds:
-                    # TODO: this means we're storing timestamps as milliseconds
-                    # We might want to use datetime or maybe convert to seconds?
-                    timestamp = timestamp * 1000
+                if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalMilliseconds:
+                    timestamp = timestamp / 1000
 
-                nodes.append(TrajectoryNode(point, timestamp, width, length, height))
+                nodes.append(
+                    TrajectoryNode(point, datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
+                )
 
             trajectories.append(Trajectory(tuple(nodes), self))
 

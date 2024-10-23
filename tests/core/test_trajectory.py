@@ -40,13 +40,13 @@ def test_trajectory_layer_create_trajectories(qgis_point_layer):
     assert len(nodes1) == 3
     assert len(nodes2) == 3
 
-    assert nodes1[0].timestamp == 100
-    assert nodes1[1].timestamp == 200
-    assert nodes1[2].timestamp == 300
+    assert nodes1[0].timestamp.timestamp() == 0.1
+    assert nodes1[1].timestamp.timestamp() == 0.2
+    assert nodes1[2].timestamp.timestamp() == 0.3
 
-    assert nodes2[0].timestamp == 500
-    assert nodes2[1].timestamp == 600
-    assert nodes2[2].timestamp == 700
+    assert nodes2[0].timestamp.timestamp() == 0.5
+    assert nodes2[1].timestamp.timestamp() == 0.6
+    assert nodes2[2].timestamp.timestamp() == 0.7
 
 
 def test_trajectory_layer_create_line_layer(qgis_point_layer):
@@ -90,9 +90,9 @@ def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
 
     assert len(nodes) == 3
 
-    assert nodes[0].timestamp == 1000
-    assert nodes[1].timestamp == 3000
-    assert nodes[2].timestamp == 6000
+    assert nodes[0].timestamp.timestamp() == 1.0
+    assert nodes[1].timestamp.timestamp() == 3.0
+    assert nodes[2].timestamp.timestamp() == 6.0
 
 
 def test_trajectory_average_speed(two_node_trajectory: Trajectory, three_node_trajectory: Trajectory):
@@ -109,7 +109,7 @@ def test_trajectory_length(three_node_trajectory: Trajectory):
 
 
 def test_trajectory_duration(three_node_trajectory: Trajectory):
-    assert three_node_trajectory.duration() == 200
+    assert three_node_trajectory.duration().total_seconds() == 0.2
 
 
 def test_trajectory_minimum_size(size_changing_trajectory: Trajectory):
