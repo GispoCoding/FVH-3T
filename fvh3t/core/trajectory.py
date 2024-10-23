@@ -93,8 +93,9 @@ class Trajectory:
             total_time += time_difference
 
         # here the distance should've already been converted
-        # to meters and the time should've been converted
-        # to milliseconds
+        # to meters and the time is stored as milliseconds
+        # in the nodes.
+        # convert to kilometers and hours respectively
         total_distance_km: float = total_distance / 1000
         total_time_h: float = ((total_time / 1000) / 60) / 60
 
