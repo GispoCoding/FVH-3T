@@ -19,7 +19,7 @@ from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLa
 from qgis.PyQt.QtCore import QVariant
 
 from fvh3t.core.gate import Gate
-from fvh3t.core.trajectory import Trajectory, TrajectoryNode
+from fvh3t.core.trajectory import Trajectory, TrajectoryNode, TrajectorySegment
 
 
 @pytest.fixture
@@ -65,6 +65,14 @@ def size_changing_trajectory():
 @pytest.fixture
 def two_point_gate():
     return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
+
+
+@pytest.fixture
+def trajectory_segment():
+    return TrajectorySegment(
+        TrajectoryNode.from_coordinates(0, 0, 0, 1, 1, 1),
+        TrajectoryNode.from_coordinates(0, 1, 1000, 1, 1, 1),
+    )
 
 
 @pytest.fixture
