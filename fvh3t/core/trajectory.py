@@ -50,29 +50,17 @@ class TrajectoryNode(NamedTuple):
         cls,
         x: float,
         y: float,
-        timestamp: datetime | float,
+        timestamp: float,
         width: float,
         length: float,
         height: float,
         *,
         timestamp_in_ms: bool = True,
     ):
-        if type(timestamp) is int:
-            timestamp = float(timestamp)
+        if timestamp_in_ms:
+            timestamp = timestamp / 1000
 
-        if type(timestamp) is float:
-            if timestamp_in_ms:
-                timestamp = timestamp / 1000
-
-            final_timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
-
-        elif type(timestamp) is datetime:
-            final_timestamp = timestamp
-        else:
-            msg = f"{timestamp} must be either a float or a datetime.datetime"
-            raise ValueError(msg)
-
-        return cls(QgsPointXY(x, y), final_timestamp, width, length, height)
+        return cls(QgsPointXY(x, y), datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
 
 
 class Trajectory:
