@@ -20,7 +20,7 @@ def test_trajectory_intersects_gate(two_node_trajectory):
 
 
 def test_trajectory_layer_create_trajectories(qgis_point_layer):
-    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     trajectories: tuple[Trajectory, ...] = traj_layer.trajectories()
@@ -38,17 +38,17 @@ def test_trajectory_layer_create_trajectories(qgis_point_layer):
     assert len(nodes1) == 3
     assert len(nodes2) == 3
 
-    assert nodes1[0].timestamp == 1000
-    assert nodes1[1].timestamp == 2000
-    assert nodes1[2].timestamp == 3000
+    assert nodes1[0].timestamp == 100
+    assert nodes1[1].timestamp == 200
+    assert nodes1[2].timestamp == 300
 
-    assert nodes2[0].timestamp == 5000
-    assert nodes2[1].timestamp == 6000
-    assert nodes2[2].timestamp == 7000
+    assert nodes2[0].timestamp == 500
+    assert nodes2[1].timestamp == 600
+    assert nodes2[2].timestamp == 700
 
 
 def test_trajectory_layer_create_line_layer(qgis_point_layer):
-    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     line_layer = traj_layer.as_line_layer()
@@ -62,12 +62,12 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     assert feat1.geometry().asWkt() == "LineString (0 0, 1 0, 2 0)"
     assert feat2.geometry().asWkt() == "LineString (5 1, 5 2, 5 3)"
 
-    assert feat1.attribute("average_speed") == 0.001
-    assert feat2.attribute("average_speed") == 0.001
+    assert feat1.attribute("average_speed") == 0.01
+    assert feat2.attribute("average_speed") == 0.01
 
 
 def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
-    traj_layer = TrajectoryLayer(qgis_point_layer_non_ordered, "id", "timestamp")
+    traj_layer = TrajectoryLayer(qgis_point_layer_non_ordered, "id", "timestamp", "width", "length", "height")
     traj_layer.create_trajectories()
 
     trajectories = traj_layer.trajectories()
@@ -83,6 +83,29 @@ def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
     assert nodes[2].timestamp == 6000
 
 
-def test_trajectory_average_speed(two_node_trajectory: Trajectory, three_node_trajectory: Trajectory):
-    assert two_node_trajectory.average_speed() == 0.001
-    assert three_node_trajectory.average_speed() == 0.001
+def test_trajectory_maximum_speed(accelerating_three_node_trajectory: Trajectory):
+    assert accelerating_three_node_trajectory.maximum_speed() == 0.03
+
+
+def test_trajectory_average_speed(three_node_trajectory: Trajectory):
+    assert three_node_trajectory.average_speed() == 0.01
+
+
+def test_trajectory_length(three_node_trajectory: Trajectory):
+    assert three_node_trajectory.length() == 2
+
+
+def test_trajectory_duration(three_node_trajectory: Trajectory):
+    assert three_node_trajectory.duration() == 200
+
+
+def test_trajectory_minimum_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.minimum_size() == (0.49, 0.49, 0.49)
+
+
+def test_trajectory_maximum_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.maximum_size() == (0.51, 0.51, 0.51)
+
+
+def test_trajectory_average_size(size_changing_trajectory: Trajectory):
+    assert size_changing_trajectory.average_size() == (0.50, 0.50, 0.50)

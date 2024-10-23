@@ -27,16 +27,20 @@ class TrajectoryNode(NamedTuple):
 
     point: QgsPointXY
     timestamp: int
+    width: float
+    length: float
+    height: float
 
     @classmethod
-    def from_coordinates(cls, x: float, y: float, timestamp: int):
-        return cls(QgsPointXY(x, y), timestamp)
+    def from_coordinates(cls, x: float, y: float, timestamp: int, width: float, length: float, height: float):
+        return cls(QgsPointXY(x, y), timestamp, width, length, height)
 
 
 class Trajectory:
     """
     Class representing a trajectory which consists
-    of nodes which have a location and a timestamp
+    of nodes which have a location, size (width, length, height),
+    and a timestamp
     """
 
     def __init__(self, nodes: tuple[TrajectoryNode, ...]) -> None:
@@ -51,24 +55,78 @@ class Trajectory:
     def intersects_gate(self, other: Gate) -> bool:
         return self.as_geometry().intersects(other.geometry())
 
-    def average_speed(self) -> float:
+    def _movement_core(self) -> tuple[float, int, float]:
         total_distance = 0.0
         total_time = 0
-        for i in range(1, len(self.__nodes)):
-            current_node = self.__nodes[i]
-            previous_node = self.__nodes[i - 1]
+        max_speed = 0.0
+        nodes = self.nodes()
+        for i in range(1, len(nodes)):
+            current_node = nodes[i]
+            previous_node = nodes[i - 1]
 
             distance = current_node.point.distance(previous_node.point)
-
             time_difference = current_node.timestamp - previous_node.timestamp
+            speed = distance / time_difference
+            if speed > max_speed:
+                max_speed = speed
 
             total_distance += distance
             total_time += time_difference
 
+        return total_distance, total_time, max_speed
+
+    def maximum_speed(self) -> float:
+        _, _, max_speed = self._movement_core()
+        return round(max_speed, 2)
+
+    def average_speed(self) -> float:
+        total_distance, total_time, _ = self._movement_core()
         if total_time > 0:
-            return total_distance / total_time
+            return round(total_distance / total_time, 2)
 
         return 0.0
+
+    def length(self) -> float:
+        length, _, _ = self._movement_core()
+        return round(length, 2)
+
+    def duration(self) -> int:
+        _, duration, _ = self._movement_core()
+        return duration
+
+    def minimum_size(self) -> tuple[float, float, float]:
+        nodes = self.nodes()
+        min_width, min_length, min_height = (
+            min((node.width for node in nodes), default=0.0),
+            min((node.length for node in nodes), default=0.0),
+            min((node.height for node in nodes), default=0.0),
+        )
+
+        return round(min_width, 2), round(min_length, 2), round(min_height, 2)
+
+    def maximum_size(self) -> tuple[float, float, float]:
+        nodes = self.nodes()
+        max_width, max_length, max_height = (
+            max((node.width for node in nodes), default=0.0),
+            max((node.length for node in nodes), default=0.0),
+            max((node.height for node in nodes), default=0.0),
+        )
+
+        return round(max_width, 2), round(max_length, 2), round(max_height, 2)
+
+    def average_size(self) -> tuple[float, float, float]:
+        nodes = self.nodes()
+        n_nodes = len(nodes)
+        if n_nodes == 0:
+            return 0.0, 0.0, 0.0
+
+        total_width, total_length, total_height = (
+            sum(node.width for node in nodes),
+            sum(node.length for node in nodes),
+            sum(node.height for node in nodes),
+        )
+
+        return round(total_width / n_nodes, 2), round(total_length / n_nodes, 2), round(total_height / n_nodes, 2)
 
 
 class TrajectoryLayer:
@@ -79,12 +137,26 @@ class TrajectoryLayer:
     1. is a point layer
     2. has a valid identifier field
     3. has a valid timestamp field
+    4. has a valid width field
+    5. has a valid length field
+    6. has a valid height field
     """
 
-    def __init__(self, layer: QgsVectorLayer, id_field: str, timestamp_field: str) -> None:
+    def __init__(
+        self,
+        layer: QgsVectorLayer,
+        id_field: str,
+        timestamp_field: str,
+        width_field: str,
+        length_field: str,
+        height_field: str,
+    ) -> None:
         self.__layer: QgsVectorLayer = layer
         self.__id_field: str = id_field
         self.__timestamp_field: str = timestamp_field
+        self.__width_field: str = width_field
+        self.__length_field: str = length_field
+        self.__height_field: str = height_field
 
         # TODO: should the class of traveler be handled here?
 
@@ -99,6 +171,15 @@ class TrajectoryLayer:
     def timestamp_field(self) -> str:
         return self.__timestamp_field
 
+    def width_field(self) -> str:
+        return self.__width_field
+
+    def length_field(self) -> str:
+        return self.__length_field
+
+    def height_field(self) -> str:
+        return self.__height_field
+
     def trajectories(self) -> tuple[Trajectory, ...]:
         return self.__trajectories
 
@@ -108,6 +189,9 @@ class TrajectoryLayer:
 
         id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
         timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
+        width_field_idx: int = self.__layer.fields().indexOf(self.__width_field)
+        length_field_idx: int = self.__layer.fields().indexOf(self.__length_field)
+        height_field_idx: int = self.__layer.fields().indexOf(self.__height_field)
 
         unique_ids: set[Any] = self.__layer.uniqueValues(id_field_idx)
 
@@ -129,8 +213,11 @@ class TrajectoryLayer:
             for feature in features:
                 point: QgsPointXY = feature.geometry().asPoint()
                 timestamp: int = feature[timestamp_field_idx]
+                width: int = feature[width_field_idx]
+                length: int = feature[length_field_idx]
+                height: int = feature[height_field_idx]
 
-                nodes.append(TrajectoryNode(point, timestamp))
+                nodes.append(TrajectoryNode(point, timestamp, width, length, height))
 
             trajectories.append(Trajectory(tuple(nodes)))
 
@@ -166,5 +253,15 @@ class TrajectoryLayer:
         is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
         id_field_exists: bool = self.__layer.fields().indexFromName(self.__id_field) != -1
         timestamp_field_exists: bool = self.__layer.fields().indexFromName(self.__timestamp_field) != -1
+        width_field_exists: bool = self.__layer.fields().indexFromName(self.__width_field) != -1
+        length_field_exists: bool = self.__layer.fields().indexFromName(self.__length_field) != -1
+        height_field_exists: bool = self.__layer.fields().indexFromName(self.__height_field) != -1
 
-        return is_point_layer and id_field_exists and timestamp_field_exists
+        return (
+            is_point_layer
+            and id_field_exists
+            and timestamp_field_exists
+            and width_field_exists
+            and length_field_exists
+            and height_field_exists
+        )
