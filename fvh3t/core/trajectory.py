@@ -70,7 +70,6 @@ class Trajectory:
         total_time = 0
 
         da = QgsDistanceArea()
-        # TODO: Cartesian or ellipsoidal?
 
         if self.__layer is not None:
             da.setSourceCrs(self.__layer.crs(), QgsCoordinateTransformContext())
