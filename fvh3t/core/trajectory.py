@@ -86,7 +86,7 @@ class Trajectory:
     def _movement_core(self) -> tuple[float, timedelta, float]:
         total_distance_m = 0.0
         total_time_s = timedelta(0)
-        max_speed_s = 0.0
+        max_speed_m_per_s = 0.0
 
         da = QgsDistanceArea()
 
@@ -108,13 +108,13 @@ class Trajectory:
             time_difference: timedelta = current_node.timestamp - previous_node.timestamp
             speed_s: float = distance_m / time_difference.total_seconds()
 
-            if speed_s > max_speed_s:
-                max_speed_s = speed_s
+            if speed_s > max_speed_m_per_s:
+                max_speed_m_per_s = speed_s
 
             total_distance_m += distance_m
             total_time_s += time_difference
 
-        return total_distance_m, total_time_s, max_speed_s
+        return total_distance_m, total_time_s, max_speed_m_per_s
 
     def maximum_speed(self) -> float:
         # here the max speed is in meters / second
