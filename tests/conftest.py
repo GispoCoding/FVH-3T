@@ -64,7 +64,20 @@ def size_changing_trajectory():
 
 @pytest.fixture
 def two_point_gate():
-    return Gate(QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]))
+    return Gate(
+        QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]),
+        counts_left=True,
+        counts_right=True,
+    )
+
+
+@pytest.fixture
+def three_point_gate():
+    return Gate(
+        QgsGeometry.fromPolylineXY([QgsPointXY(1, 1), QgsPointXY(2, 1), QgsPointXY(2, 2)]),
+        counts_left=True,
+        counts_right=True,
+    )
 
 
 @pytest.fixture
@@ -247,6 +260,61 @@ def qgis_point_layer_for_gate_count():
     layer.addFeature(traj2_f1)
     layer.addFeature(traj2_f2)
     layer.addFeature(traj2_f3)
+
+    layer.commitChanges()
+
+    return layer
+
+
+@pytest.fixture
+def qgis_gate_line_layer():
+    layer = QgsVectorLayer("LineString?crs=EPSG:3067", "Line Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("counts_left", QVariant.Bool))
+    layer.addAttribute(QgsField("counts_right", QVariant.Bool))
+
+    gate1 = QgsFeature(layer.fields())
+    gate1.setAttributes([True, True])
+    gate1.setGeometry(
+        QgsGeometry.fromPolylineXY(
+            [
+                QgsPointXY(0, 0),
+                QgsPointXY(0, 1),
+                QgsPointXY(0, 2),
+            ]
+        )
+    )
+
+    gate2 = QgsFeature(layer.fields())
+    gate2.setAttributes([False, True])
+    gate2.setGeometry(
+        QgsGeometry.fromPolylineXY(
+            [
+                QgsPointXY(5, 5),
+                QgsPointXY(10, 10),
+            ]
+        )
+    )
+
+    gate3 = QgsFeature(layer.fields())
+    gate3.setAttributes([True, False])
+    gate3.setGeometry(
+        QgsGeometry.fromPolylineXY(
+            [
+                QgsPointXY(0.25, 1),
+                QgsPointXY(1, 1),
+                QgsPointXY(1.5, 0.5),
+                QgsPointXY(1.5, 0),
+                QgsPointXY(1, -0.5),
+            ]
+        )
+    )
+
+    layer.addFeature(gate1)
+    layer.addFeature(gate2)
+    layer.addFeature(gate3)
 
     layer.commitChanges()
 

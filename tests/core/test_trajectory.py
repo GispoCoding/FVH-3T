@@ -12,7 +12,6 @@ def test_trajectory_layer_create_trajectories(qgis_point_layer):
     traj_layer = TrajectoryLayer(
         qgis_point_layer, "id", "timestamp", "width", "length", "height", QgsUnitTypes.TemporalUnit.TemporalMilliseconds
     )
-    traj_layer.create_trajectories()
 
     trajectories: tuple[Trajectory, ...] = traj_layer.trajectories()
     assert len(trajectories) == 2
@@ -42,7 +41,6 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     traj_layer = TrajectoryLayer(
         qgis_point_layer, "id", "timestamp", "width", "length", "height", QgsUnitTypes.TemporalUnit.TemporalMilliseconds
     )
-    traj_layer.create_trajectories()
 
     line_layer = traj_layer.as_line_layer()
 
@@ -69,7 +67,6 @@ def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
         "height",
         QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
     )
-    traj_layer.create_trajectories()
 
     trajectories = traj_layer.trajectories()
 

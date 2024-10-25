@@ -29,6 +29,15 @@ class GateSegment:
 
         self.__geom = QgsGeometry.fromPolylineXY([point_a, point_b])
 
+    def point_a(self) -> QgsPointXY:
+        return self.__point_a
+
+    def point_b(self) -> QgsPointXY:
+        return self.__point_b
+
+    def geometry(self) -> QgsGeometry:
+        return self.__geom
+
     def trajectory_segment_crosses(self, traj_seg: TrajectorySegment, *, counts_left: bool, counts_right: bool) -> bool:
         crosses = self.__geom.crosses(traj_seg.as_geometry())
 
@@ -50,14 +59,14 @@ class GateSegment:
         if counts_left and counts_right:
             return True
 
-        crosses_from: RelativeDirection = self._trajectory_segment_crosses_from(traj_seg)
+        crosses_from: RelativeDirection = self.trajectory_segment_crosses_from(traj_seg)
 
         if counts_left and crosses_from == RelativeDirection.LEFT:
             return True
 
         return counts_right and crosses_from == RelativeDirection.RIGHT
 
-    def _trajectory_segment_crosses_from(self, segment: TrajectorySegment) -> RelativeDirection:
+    def trajectory_segment_crosses_from(self, segment: TrajectorySegment) -> RelativeDirection:
         node_a_dir: RelativeDirection = self.point_relative_direction(segment.node_a.point)
         node_b_dir: RelativeDirection = self.point_relative_direction(segment.node_b.point)
 
@@ -250,7 +259,7 @@ class GateLayer:
             msg = "Layer is not valid."
             raise ValueError(msg)
 
-        is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
+        is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.LineGeometry
         if not is_point_layer:
             msg = "Layer is not a point layer."
             raise ValueError(msg)
