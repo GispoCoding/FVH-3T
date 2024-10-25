@@ -22,6 +22,8 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 
+from fvh3t.core.exceptions import InvalidLayerException
+
 if TYPE_CHECKING:
     from fvh3t.core.gate import Gate
 
@@ -255,8 +257,12 @@ class TrajectoryLayer:
                     self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalMilliseconds
                 else:
                     self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalSeconds
+        else:
+            msg = "TrajectoryLayer could not be properly created!"
+            raise InvalidLayerException(msg)
 
         self.__trajectories: tuple[Trajectory, ...] = ()
+        self.create_trajectories()
 
         # TODO: should the class of traveler be handled here?
 
@@ -291,9 +297,6 @@ class TrajectoryLayer:
         return self.__layer.crs()
 
     def create_trajectories(self) -> None:
-        if not self.is_valid():
-            return
-
         id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
         timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
         width_field_idx: int = self.__layer.fields().indexOf(self.__width_field)
@@ -336,9 +339,6 @@ class TrajectoryLayer:
         self.__trajectories = tuple(trajectories)
 
     def as_line_layer(self) -> QgsVectorLayer | None:
-        if not self.is_valid():
-            return None
-
         # TODO: can this be a memory layer?
         line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
 

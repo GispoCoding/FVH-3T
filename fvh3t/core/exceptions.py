@@ -7,3 +7,7 @@ class InvalidGeometryTypeException(QgsPluginException):
 
 class InvalidDirectionException(QgsPluginException):
     pass
+
+
+class InvalidLayerException(QgsPluginException):
+    pass
