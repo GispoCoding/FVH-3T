@@ -222,23 +222,23 @@ def qgis_point_layer_for_gate_count():
 
     traj1_f2 = QgsFeature(layer.fields())
     traj1_f2.setAttributes([1, 200, 1, 1, 1])
-    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0.5)))
+    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 1)))
 
     traj1_f3 = QgsFeature(layer.fields())
     traj1_f3.setAttributes([1, 300, 1, 1, 1])
-    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 1)))
+    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 2)))
 
     traj2_f1 = QgsFeature(layer.fields())
     traj2_f1.setAttributes([2, 500, 1, 1, 1])
-    traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 0)))
+    traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 2)))
 
     traj2_f2 = QgsFeature(layer.fields())
     traj2_f2.setAttributes([2, 600, 1, 1, 1])
-    traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 0.5)))
+    traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 1)))
 
     traj2_f3 = QgsFeature(layer.fields())
     traj2_f3.setAttributes([2, 700, 1, 1, 1])
-    traj2_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 1)))
+    traj2_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.25, 0)))
 
     layer.addFeature(traj1_f1)
     layer.addFeature(traj1_f2)
