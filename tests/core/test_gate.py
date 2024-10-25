@@ -211,7 +211,7 @@ def test_gate_layer_create_gates(qgis_gate_line_layer):
     assert gate3.geometry().asWkt() == "LineString (0.25 1, 1 1, 1.5 0.5, 1.5 0, 1 -0.5)"
 
     assert gate1.counts_left()
-    assert not gate1.counts_right()
+    assert gate1.counts_right()
 
     assert not gate2.counts_left()
     assert gate2.counts_right()
