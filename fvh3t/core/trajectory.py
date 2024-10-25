@@ -97,9 +97,6 @@ class Trajectory:
     def as_geometry(self) -> QgsGeometry:
         return QgsGeometry.fromPolylineXY([node.point for node in self.__nodes])
 
-    def intersects_gate(self, other: Gate) -> bool:
-        return self.as_geometry().intersects(other.geometry())
-
     def as_segments(self) -> tuple[TrajectorySegment, ...]:
         segments: list[TrajectorySegment] = []
         for i in range(1, len(self.__nodes)):
