@@ -63,6 +63,23 @@ class TrajectoryNode(NamedTuple):
         return cls(QgsPointXY(x, y), datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
 
 
+class TrajectorySegment:
+    """
+    Class representing the segment between two
+    TrajectoryNodes.
+    """
+
+    def __init__(self, node_a: TrajectoryNode, node_b: TrajectoryNode) -> None:
+        self.node_a = node_a
+        self.node_b = node_b
+
+    def as_geometry(self) -> QgsGeometry:
+        return QgsGeometry.fromPolylineXY([self.node_a.point, self.node_b.point])
+
+    def intersects_gate(self, gate: Gate) -> bool:
+        return self.as_geometry().intersects(gate.geometry())
+
+
 class Trajectory:
     """
     Class representing a trajectory which consists
@@ -82,6 +99,16 @@ class Trajectory:
 
     def intersects_gate(self, other: Gate) -> bool:
         return self.as_geometry().intersects(other.geometry())
+
+    def as_segments(self) -> tuple[TrajectorySegment, ...]:
+        segments: list[TrajectorySegment] = []
+        for i in range(1, len(self.__nodes)):
+            previous_node: TrajectoryNode = self.__nodes[i - 1]
+            current_node: TrajectoryNode = self.__nodes[i]
+
+            segments.append(TrajectorySegment(previous_node, current_node))
+
+        return tuple(segments)
 
     def _movement_core(self) -> tuple[float, timedelta, float]:
         total_distance_m = 0.0
