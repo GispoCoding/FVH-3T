@@ -102,7 +102,7 @@ def test_trajectory_segment_crosses_from():
 
     assert gate_seg1.trajectory_segment_crosses_from(traj_seg1) == RelativeDirection.RIGHT
     assert gate_seg1.trajectory_segment_crosses_from(traj_seg2) == RelativeDirection.LEFT
-    with pytest.raises(InvalidDirectionException, match="Both nodes cannot be on the same side!"):
+    with pytest.raises(InvalidDirectionException, match="Segments do not cross!"):
         gate_seg1.trajectory_segment_crosses_from(traj_seg3)
 
     assert gate_seg2.trajectory_segment_crosses_from(traj_seg1) == RelativeDirection.RIGHT

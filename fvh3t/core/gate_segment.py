@@ -67,51 +67,39 @@ class GateSegment:
         return counts_right and crosses_from == RelativeDirection.RIGHT
 
     def trajectory_segment_crosses_from(self, segment: TrajectorySegment) -> RelativeDirection:
+        """
+        Check which relative direction a trajectory
+        segment crosses this gate segment from. There are
+        two assumptions:
+
+        1) the segments actually cross (should be checked beforehand)
+           an error is raised if this is not the case
+        2) node A of the trajectory segment is first, timewise
+        """
         node_a_dir: RelativeDirection = self.point_relative_direction(segment.node_a.point)
         node_b_dir: RelativeDirection = self.point_relative_direction(segment.node_b.point)
 
         crosses_from: RelativeDirection = RelativeDirection.UNKNOWN
 
-        # node A should always be the first node, timewise
-
         if node_a_dir == RelativeDirection.LEFT and node_b_dir == RelativeDirection.RIGHT:
             crosses_from = RelativeDirection.LEFT
         elif node_a_dir == RelativeDirection.RIGHT and node_b_dir == RelativeDirection.LEFT:
             crosses_from = RelativeDirection.RIGHT
-        elif node_a_dir == RelativeDirection.COLLINEAR and node_b_dir == RelativeDirection.RIGHT:
-            crosses_from = RelativeDirection.LEFT
-        elif (
-            node_a_dir == RelativeDirection.COLLINEAR
-            and node_b_dir == RelativeDirection.LEFT
-            or node_a_dir == RelativeDirection.RIGHT
-            and node_b_dir == RelativeDirection.COLLINEAR
-        ):
-            crosses_from = RelativeDirection.RIGHT
-        elif node_a_dir == RelativeDirection.LEFT and node_b_dir == RelativeDirection.COLLINEAR:
-            crosses_from = RelativeDirection.LEFT
-        elif node_a_dir == RelativeDirection.COLLINEAR and node_b_dir == RelativeDirection.COLLINEAR:
-            # i.e. the trajectory segment is exactly
-            # on this gate segment.
-            # realistically this should be extremely rare,
-            # but regardless we have to deal with this
-            # edge case.
-            crosses_from = RelativeDirection.COLLINEAR
-        elif node_a_dir == node_b_dir:
-            # it is assumed that it has already been checked
-            # that the trajectory segment intersects
-            # this gate segment.
-            # therefore this should never happen and
-            # we throw an error
-
-            msg = "Both nodes cannot be on the same side!"
-            raise InvalidDirectionException(msg)
         else:
-            # this would require either dir
-            # being UNKNOWN which should never
-            # happen, so throw an error
+            # NOTE: this means that the segments do *not* cross i.e.
+            #   1. one or both nodes are collinear with this gate segment
+            #   2. both nodes are on the same side
+            # This should never happen so raise an error.
 
-            msg = "Directions cannot be unkown!"
+            msg = "Segments do not cross!"
             raise InvalidDirectionException(msg)
+
+            # NOTE: Technically this else block would catch
+            # cases where either node_dir is UNKNOWN, but
+            # since point_relative_direction() can't return
+            # UNKNOWN we should be able to assume that
+            # the cause to always be that the segments
+            # don't actually cross
 
         return crosses_from
 
