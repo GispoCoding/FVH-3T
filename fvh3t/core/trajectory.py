@@ -12,8 +12,9 @@ from qgis.core import (
     QgsUnitTypes,
 )
 
+from fvh3t.core.trajectory_segment import TrajectorySegment
+
 if TYPE_CHECKING:
-    from fvh3t.core.gate import Gate
     from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 
@@ -45,23 +46,6 @@ class TrajectoryNode(NamedTuple):
             timestamp = timestamp / 1000
 
         return cls(QgsPointXY(x, y), datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
-
-
-class TrajectorySegment:
-    """
-    Class representing the segment between two
-    TrajectoryNodes.
-    """
-
-    def __init__(self, node_a: TrajectoryNode, node_b: TrajectoryNode) -> None:
-        self.node_a = node_a
-        self.node_b = node_b
-
-    def as_geometry(self) -> QgsGeometry:
-        return QgsGeometry.fromPolylineXY([self.node_a.point, self.node_b.point])
-
-    def intersects_gate(self, gate: Gate) -> bool:
-        return self.as_geometry().intersects(gate.geometry())
 
 
 class Trajectory:
