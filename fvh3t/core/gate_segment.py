@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from qgis.core import QgsGeometry, QgsPointXY
 
 from fvh3t.core.exceptions import InvalidDirectionException
-
-if TYPE_CHECKING:
-    from fvh3t.core.trajectory_segment import TrajectorySegment
+from fvh3t.core.trajectory_segment import TrajectorySegment
 
 
 class RelativeDirection(Enum):
@@ -38,21 +35,25 @@ class GateSegment:
     def geometry(self) -> QgsGeometry:
         return self.__geom
 
-    def trajectory_segment_crosses(self, traj_seg: TrajectorySegment, *, counts_left: bool, counts_right: bool) -> bool:
+    def trajectory_segment_crosses(
+        self,
+        traj_seg: TrajectorySegment,
+        previous_traj_seg: TrajectorySegment | None = None,
+        *,
+        counts_left: bool,
+        counts_right: bool,
+    ) -> bool:
         crosses = self.__geom.crosses(traj_seg.as_geometry())
 
         if not crosses:
             if self.__geom.intersects(traj_seg.as_geometry()):
-                # TODO: Handle case where the segment doesn't cross this segment
-                # but instead intersects it. In practice this means that when a trajectory
-                # has a vertex exactly on this segment we cannot rely on calculating
-                # the crossing direction from the singular segment.
-                # Realistically the chances of a trajectory node landing exactly on the
-                # gate segment should be extremely rare, but regardless we do need
-                # to deal with that... BUT right now in the interest of moving things
-                # forwards I'm leaving this as a TODO
-                msg = "Cannot determine direction from trajectory segment!"
-                raise InvalidDirectionException(msg)
+                if previous_traj_seg is None:
+                    return False
+
+                # make a new segment
+                seg = TrajectorySegment(previous_traj_seg.node_a, traj_seg.node_b)
+
+                return self.trajectory_segment_crosses(seg, counts_left=counts_left, counts_right=counts_right)
 
             return False
 

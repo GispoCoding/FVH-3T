@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from fvh3t.core.exceptions import InvalidDirectionException, InvalidGeometryTypeException
 
 if TYPE_CHECKING:
-    from fvh3t.core.trajectory import Trajectory
+    from fvh3t.core.trajectory import Trajectory, TrajectorySegment
     from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 from qgis.core import QgsGeometry, QgsPointXY, QgsWkbTypes
@@ -80,15 +80,22 @@ class Gate:
     def count_trajectories(self, trajectories: tuple[Trajectory, ...]) -> None:
         for trajectory in trajectories:
             # check if geometries cross at all before
-            # checking which specific segments intersect
+            # checking which specific segments cross
             # to save time
             if self.crosses_trajectory(trajectory):
-                for traj_seg in trajectory.as_segments():
-                    for segment in self.__segments:
+                traj_segments: tuple[TrajectorySegment, ...] = trajectory.as_segments()
+                for i in range(len(traj_segments)):
+                    traj_seg: TrajectorySegment = traj_segments[i]
+                    for gate_segment in self.__segments:
                         # TODO: The case where a trajectory crosses
                         # the same gate multiple times is not handled
-                        crosses: bool = segment.trajectory_segment_crosses(
-                            traj_seg, counts_left=self.__counts_left, counts_right=self.__counts_right
+
+                        previous_traj_seg: TrajectorySegment | None = traj_segments[i - 1] if i > 0 else None
+                        crosses: bool = gate_segment.trajectory_segment_crosses(
+                            traj_seg,
+                            previous_traj_seg,
+                            counts_left=self.__counts_left,
+                            counts_right=self.__counts_right,
                         )
                         if crosses:
                             self.__trajectory_count += 1
