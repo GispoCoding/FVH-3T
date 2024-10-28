@@ -1,3 +1,6 @@
+import pytest
+
+from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.gate_layer import GateLayer
 
 
@@ -32,3 +35,19 @@ def test_gate_layer_create_gates(qgis_gate_line_layer):
     assert len(gate1.segments()) == 2
     assert len(gate2.segments()) == 1
     assert len(gate3.segments()) == 4
+
+
+def test_is_field_valid(qgis_gate_line_layer, qgis_gate_line_layer_wrong_field_type):
+    with pytest.raises(InvalidLayerException, match="Counts left field either not found or of incorrect type."):
+        GateLayer(
+            qgis_gate_line_layer,
+            "count_right",  # use wrong field names on purpose
+            "count_left",
+        )
+
+    with pytest.raises(InvalidLayerException, match="Counts right field either not found or of incorrect type."):
+        GateLayer(
+            qgis_gate_line_layer_wrong_field_type,
+            "counts_left",
+            "counts_right",
+        )

@@ -68,21 +68,16 @@ class TrajectoryLayer:
             if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalUnknownUnit:
                 first_feature = self.__layer.getFeature(1)
 
-                # TODO: ensure that this is a numeric field
-                # OR handle cases where it isn't
-                timestamp: int = first_feature.attribute(self.__timestamp_field)
+                timestamp: float = first_feature.attribute(self.__timestamp_field)
 
                 # if a unix timestamp is in seconds and
                 # has 13 or more digits it is in year >= 33658
                 # so in this case let's assume that the
                 # timestamp is actually in milliseconds
-                if digits_in_timestamp_int(timestamp) >= UNIX_TIMESTAMP_UNIT_THRESHOLD:
+                if digits_in_timestamp_int(int(timestamp)) >= UNIX_TIMESTAMP_UNIT_THRESHOLD:
                     self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalMilliseconds
                 else:
                     self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalSeconds
-        else:
-            msg = "TrajectoryLayer could not be properly created!"
-            raise InvalidLayerException(msg)
 
         self.__trajectories: tuple[Trajectory, ...] = ()
         self.create_trajectories()
@@ -146,9 +141,9 @@ class TrajectoryLayer:
             for feature in features:
                 point: QgsPointXY = feature.geometry().asPoint()
                 timestamp: float = feature[timestamp_field_idx]
-                width: int = feature[width_field_idx]
-                length: int = feature[length_field_idx]
-                height: int = feature[height_field_idx]
+                width: float = feature[width_field_idx]
+                length: float = feature[length_field_idx]
+                height: float = feature[height_field_idx]
 
                 if self.__timestamp_units == QgsUnitTypes.TemporalUnit.TemporalMilliseconds:
                     timestamp = timestamp / 1000
@@ -184,45 +179,59 @@ class TrajectoryLayer:
 
         return line_layer
 
+    def is_field_valid(self, field_name: str, *, accepted_types: list[str]) -> bool:
+        """
+        Check that a field 1) exists and 2) has an
+        acceptable type. Leave type list empty to
+        allow any type.
+        """
+        field_id: int = self.__layer.fields().indexFromName(field_name)
+
+        if field_id == -1:
+            return False
+
+        if not accepted_types:  # means all types are accepted
+            return True
+
+        field: QgsField = self.__layer.fields().field(field_id)
+        field_type: str = field.displayType()
+
+        return field_type in accepted_types
+
     def is_valid(self) -> bool:
         is_layer_valid: bool = self.__layer.isValid()
         if not is_layer_valid:
             msg = "Layer is not valid."
-            raise ValueError(msg)
+            raise InvalidLayerException(msg)
 
         is_point_layer: bool = self.__layer.geometryType() == QgsWkbTypes.GeometryType.PointGeometry
         if not is_point_layer:
             msg = "Layer is not a point layer."
-            raise ValueError(msg)
+            raise InvalidLayerException(msg)
 
         has_features: bool = self.__layer.hasFeatures() == QgsFeatureSource.FeatureAvailability.FeaturesAvailable
         if not has_features:
             msg = "Layer has no features."
-            raise ValueError(msg)
+            raise InvalidLayerException(msg)
 
-        id_field_exists: bool = self.__layer.fields().indexFromName(self.__id_field) != -1
-        if not id_field_exists:
-            msg = "Id field not found in the layer."
-            raise ValueError(msg)
+        if not self.is_field_valid(self.__id_field, accepted_types=[]):
+            msg = "Id field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
 
-        timestamp_field_exists: bool = self.__layer.fields().indexFromName(self.__timestamp_field) != -1
-        if not timestamp_field_exists:
-            msg = "Timestamp field not found in the layer."
-            raise ValueError(msg)
+        if not self.is_field_valid(self.__timestamp_field, accepted_types=["integer", "double"]):
+            msg = "Timestamp field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
 
-        width_field_exists: bool = self.__layer.fields().indexFromName(self.__width_field) != -1
-        if not width_field_exists:
-            msg = "Width field not found in the layer."
-            raise ValueError(msg)
+        if not self.is_field_valid(self.__width_field, accepted_types=["integer", "double"]):
+            msg = "Width field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
 
-        length_field_exists: bool = self.__layer.fields().indexFromName(self.__length_field) != -1
-        if not length_field_exists:
-            msg = "Length field not found in the layer."
-            raise ValueError(msg)
+        if not self.is_field_valid(self.__length_field, accepted_types=["integer", "double"]):
+            msg = "Length field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
 
-        height_field_exists: bool = self.__layer.fields().indexFromName(self.__height_field) != -1
-        if not height_field_exists:
-            msg = "Height field not found in the layer."
-            raise ValueError(msg)
+        if not self.is_field_valid(self.__height_field, accepted_types=["integer", "double"]):
+            msg = "Height field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
 
         return True

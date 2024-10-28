@@ -218,6 +218,39 @@ def qgis_point_layer_no_additional_fields():
 
 
 @pytest.fixture
+def qgis_point_layer_wrong_type():
+    layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("id", QVariant.Int))
+    layer.addAttribute(QgsField("timestamp", QVariant.String))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
+
+    traj1_f1 = QgsFeature(layer.fields())
+    traj1_f1.setAttributes([1, 3000, 1, 1, 1])
+    traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
+
+    traj1_f2 = QgsFeature(layer.fields())
+    traj1_f2.setAttributes([1, 6000, 1, 1, 1])
+    traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0)))
+
+    traj1_f3 = QgsFeature(layer.fields())
+    traj1_f3.setAttributes([1, 1000, 1, 1, 1])
+    traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2, 0)))
+
+    layer.addFeature(traj1_f1)
+    layer.addFeature(traj1_f2)
+    layer.addFeature(traj1_f3)
+
+    layer.commitChanges()
+
+    return layer
+
+
+@pytest.fixture
 def qgis_point_layer_for_gate_count():
     layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
 
@@ -315,6 +348,34 @@ def qgis_gate_line_layer():
     layer.addFeature(gate1)
     layer.addFeature(gate2)
     layer.addFeature(gate3)
+
+    layer.commitChanges()
+
+    return layer
+
+
+@pytest.fixture
+def qgis_gate_line_layer_wrong_field_type():
+    layer = QgsVectorLayer("LineString?crs=EPSG:3067", "Line Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("counts_left", QVariant.Bool))
+    layer.addAttribute(QgsField("counts_right", QVariant.Int))
+
+    gate = QgsFeature(layer.fields())
+    gate.setAttributes([True, True])
+    gate.setGeometry(
+        QgsGeometry.fromPolylineXY(
+            [
+                QgsPointXY(0, 0),
+                QgsPointXY(0, 1),
+                QgsPointXY(0, 2),
+            ]
+        )
+    )
+
+    layer.addFeature(gate)
 
     layer.commitChanges()
 
