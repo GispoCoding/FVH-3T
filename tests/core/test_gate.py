@@ -68,8 +68,32 @@ def test_trajectory_crosses_topological(two_point_gate):
         ),
     )
 
+    traj3 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, -1, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -0.5, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 2, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 3, 1000, 0, 0, 0),
+        ),
+    )
+
+    traj4 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 3, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 2, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -0.5, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -1, 0, 0, 0, 0),
+        ),
+    )
+
     two_point_gate.set_counts_left(state=False)
 
-    two_point_gate.count_trajectories([traj1, traj2])
+    two_point_gate.count_trajectories([traj1, traj2, traj3, traj4])
 
-    assert two_point_gate.trajectory_count() == 1
+    assert two_point_gate.trajectory_count() == 2
