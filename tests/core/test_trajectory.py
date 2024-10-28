@@ -1,7 +1,6 @@
 import pytest
-from qgis.core import QgsGeometry, QgsPointXY, QgsUnitTypes
+from qgis.core import QgsUnitTypes
 
-from fvh3t.core.gate import Gate
 from fvh3t.core.trajectory import Trajectory, TrajectoryLayer, TrajectoryNode, TrajectorySegment
 
 
@@ -9,22 +8,10 @@ def test_trajectory_as_geometry(two_node_trajectory: Trajectory) -> None:
     assert two_node_trajectory.as_geometry().asWkt() == "LineString (0 0, 0 1)"
 
 
-def test_trajectory_intersects_gate(two_node_trajectory):
-    geom1 = QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)])
-    geom2 = QgsGeometry.fromPolylineXY([QgsPointXY(-1, -1), QgsPointXY(-2, -2)])
-
-    gate1 = Gate(geom1)
-    gate2 = Gate(geom2)
-
-    assert two_node_trajectory.intersects_gate(gate1)
-    assert not two_node_trajectory.intersects_gate(gate2)
-
-
 def test_trajectory_layer_create_trajectories(qgis_point_layer):
     traj_layer = TrajectoryLayer(
         qgis_point_layer, "id", "timestamp", "width", "length", "height", QgsUnitTypes.TemporalUnit.TemporalMilliseconds
     )
-    traj_layer.create_trajectories()
 
     trajectories: tuple[Trajectory, ...] = traj_layer.trajectories()
     assert len(trajectories) == 2
@@ -54,7 +41,6 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     traj_layer = TrajectoryLayer(
         qgis_point_layer, "id", "timestamp", "width", "length", "height", QgsUnitTypes.TemporalUnit.TemporalMilliseconds
     )
-    traj_layer.create_trajectories()
 
     line_layer = traj_layer.as_line_layer()
 
@@ -81,7 +67,6 @@ def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
         "height",
         QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
     )
-    traj_layer.create_trajectories()
 
     trajectories = traj_layer.trajectories()
 
@@ -215,10 +200,3 @@ def test_trajectory_as_segments(two_node_trajectory, three_node_trajectory):
 
 def test_trajectory_segment_as_geometry(trajectory_segment):
     assert trajectory_segment.as_geometry().asWkt() == "LineString (0 0, 0 1)"
-
-
-def test_trajectory_segment_intersects_gate(trajectory_segment, two_point_gate):
-    gate = Gate(QgsGeometry.fromPolylineXY([QgsPointXY(5, 5), QgsPointXY(10, 10)]))
-
-    assert trajectory_segment.intersects_gate(two_point_gate)
-    assert not trajectory_segment.intersects_gate(gate)
