@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import pytest
 from qgis.core import QgsUnitTypes
 
+from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 if TYPE_CHECKING:
@@ -83,7 +84,7 @@ def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
 
 
 def test_is_valid_is_layer_valid(qgis_vector_layer):
-    with pytest.raises(ValueError, match="Layer is not valid."):
+    with pytest.raises(InvalidLayerException, match="Layer is not valid."):
         TrajectoryLayer(
             qgis_vector_layer,
             "id",
@@ -96,7 +97,7 @@ def test_is_valid_is_layer_valid(qgis_vector_layer):
 
 
 def test_is_valid_is_point_layer(qgis_line_layer):
-    with pytest.raises(ValueError, match="Layer is not a point layer."):
+    with pytest.raises(InvalidLayerException, match="Layer is not a point layer."):
         TrajectoryLayer(
             qgis_line_layer,
             "id",
@@ -109,7 +110,7 @@ def test_is_valid_is_point_layer(qgis_line_layer):
 
 
 def test_is_valid_has_features(qgis_point_layer_no_features):
-    with pytest.raises(ValueError, match="Layer has no features."):
+    with pytest.raises(InvalidLayerException, match="Layer has no features."):
         TrajectoryLayer(
             qgis_point_layer_no_features,
             "id",
@@ -121,10 +122,21 @@ def test_is_valid_has_features(qgis_point_layer_no_features):
         )
 
 
-def test_is_valid_id_field_exists(qgis_point_layer_no_additional_fields):
-    with pytest.raises(ValueError, match="Id field not found in the layer."):
+def test_is_field_valid(qgis_point_layer_no_additional_fields, qgis_point_layer_wrong_type):
+    with pytest.raises(InvalidLayerException, match="Id field either not found or of incorrect type."):
         TrajectoryLayer(
             qgis_point_layer_no_additional_fields,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
+
+    with pytest.raises(InvalidLayerException, match="Timestamp field either not found or of incorrect type."):
+        TrajectoryLayer(
+            qgis_point_layer_wrong_type,
             "id",
             "timestamp",
             "width",
