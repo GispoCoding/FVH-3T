@@ -38,6 +38,12 @@ class Gate:
         self.__segments: tuple[GateSegment, ...] = ()
         self.create_segments()
 
+    def set_counts_left(self, *, state: bool) -> None:
+        self.__counts_left = state
+
+    def set_counts_right(self, *, state: bool) -> None:
+        self.__counts_right = state
+
     def geometry(self) -> QgsGeometry:
         return self.__geom
 
@@ -73,7 +79,7 @@ class Gate:
 
     def count_trajectories(self, trajectories: tuple[Trajectory, ...]) -> None:
         for trajectory in trajectories:
-            # check if geometries intersect at all before
+            # check if geometries cross at all before
             # checking which specific segments intersect
             # to save time
             if self.crosses_trajectory(trajectory):
