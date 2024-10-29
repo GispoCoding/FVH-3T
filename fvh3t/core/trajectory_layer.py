@@ -19,7 +19,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 
-from fvh3t.core.exceptions import InvalidLayerException
+from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 UNIX_TIMESTAMP_UNIT_THRESHOLD = 13
@@ -205,6 +205,9 @@ class TrajectoryLayer:
                 ]
             )
             feature.setGeometry(trajectory.as_geometry())
+
+            if not feature.isValid():
+                raise InvalidFeatureException
 
             line_layer.addFeature(feature)
 

@@ -11,3 +11,7 @@ class InvalidDirectionException(QgsPluginException):
 
 class InvalidLayerException(QgsPluginException):
     pass
+
+
+class InvalidFeatureException(QgsPluginException):
+    pass
