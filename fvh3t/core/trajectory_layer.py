@@ -192,7 +192,7 @@ class TrajectoryLayer:
                     trajectory.average_speed(),
                     trajectory.maximum_speed(),
                     trajectory.length(),
-                    trajectory.duration(),
+                    trajectory.duration().seconds,
                     min_size_x,
                     min_size_y,
                     min_size_z,
