@@ -164,13 +164,46 @@ class TrajectoryLayer:
 
         line_layer.addAttribute(QgsField("fid", QVariant.Int))
         line_layer.addAttribute(QgsField("average_speed", QVariant.Double))
+        line_layer.addAttribute(QgsField("maximum_speed", QVariant.Double))
+        line_layer.addAttribute(QgsField("length", QVariant.Double))
+        line_layer.addAttribute(QgsField("duration", QVariant.Double))
+        line_layer.addAttribute(QgsField("minimum_size_x", QVariant.Double))
+        line_layer.addAttribute(QgsField("minimum_size_y", QVariant.Double))
+        line_layer.addAttribute(QgsField("minimum_size_z", QVariant.Double))
+        line_layer.addAttribute(QgsField("maximum_size_x", QVariant.Double))
+        line_layer.addAttribute(QgsField("maximum_size_y", QVariant.Double))
+        line_layer.addAttribute(QgsField("maximum_size_z", QVariant.Double))
+        line_layer.addAttribute(QgsField("average_size_x", QVariant.Double))
+        line_layer.addAttribute(QgsField("average_size_y", QVariant.Double))
+        line_layer.addAttribute(QgsField("average_size_z", QVariant.Double))
 
         fields = line_layer.fields()
 
         for i, trajectory in enumerate(self.__trajectories):
             feature = QgsFeature(fields)
 
-            feature.setAttributes([i, trajectory.average_speed()])
+            min_size_x, min_size_y, min_size_z = trajectory.minimum_size()
+            max_size_x, max_size_y, max_size_z = trajectory.maximum_size()
+            avg_size_x, avg_size_y, avg_size_z = trajectory.average_size()
+
+            feature.setAttributes(
+                [
+                    i,
+                    trajectory.average_speed(),
+                    trajectory.maximum_speed(),
+                    trajectory.length(),
+                    trajectory.duration(),
+                    min_size_x,
+                    min_size_y,
+                    min_size_z,
+                    max_size_x,
+                    max_size_y,
+                    max_size_z,
+                    avg_size_x,
+                    avg_size_y,
+                    avg_size_z,
+                ]
+            )
             feature.setGeometry(trajectory.as_geometry())
 
             line_layer.addFeature(feature)
