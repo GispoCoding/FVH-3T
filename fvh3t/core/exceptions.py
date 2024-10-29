@@ -15,3 +15,7 @@ class InvalidLayerException(QgsPluginException):
 
 class InvalidFeatureException(QgsPluginException):
     pass
+
+
+class InvalidSegmentException(QgsPluginException):
+    pass
