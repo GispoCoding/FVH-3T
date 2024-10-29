@@ -48,6 +48,7 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
 
     assert line_layer is not None
     assert line_layer.featureCount() == 2
+    assert len(line_layer.fields()) == 14
 
     feat1 = line_layer.getFeature(1)
     feat2 = line_layer.getFeature(2)

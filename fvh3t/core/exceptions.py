@@ -15,3 +15,7 @@ class InvalidLayerException(QgsPluginException):
 
 class InvalidTrajectoryException(QgsPluginException):
     pass
+
+
+class InvalidFeatureException(QgsPluginException):
+    pass
