@@ -1,4 +1,7 @@
-from fvh3t.core.trajectory import Trajectory
+import pytest
+
+from fvh3t.core.exceptions import InvalidTrajectoryException
+from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 
 def test_trajectory_as_geometry(two_node_trajectory: Trajectory) -> None:
@@ -32,3 +35,8 @@ def test_trajectory_maximum_size(size_changing_trajectory: Trajectory):
 
 def test_trajectory_average_size(size_changing_trajectory: Trajectory):
     assert size_changing_trajectory.average_size() == (0.50, 0.50, 0.50)
+
+
+def test_invalid_trajectory():
+    with pytest.raises(InvalidTrajectoryException, match="Trajectory must consist of at least two nodes."):
+        Trajectory((TrajectoryNode.from_coordinates(0, 0, 100, 1, 1, 1),))

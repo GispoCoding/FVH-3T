@@ -89,6 +89,29 @@ def trajectory_segment():
 
 
 @pytest.fixture
+def qgis_single_point_layer():
+    layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("id", QVariant.Int))
+    layer.addAttribute(QgsField("timestamp", QVariant.Double))
+    layer.addAttribute(QgsField("width", QVariant.Int))
+    layer.addAttribute(QgsField("length", QVariant.Int))
+    layer.addAttribute(QgsField("height", QVariant.Int))
+
+    traj1_f1 = QgsFeature(layer.fields())
+    traj1_f1.setAttributes([1, 100, 1, 1, 1])
+    traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0)))
+
+    layer.addFeature(traj1_f1)
+
+    layer.commitChanges()
+
+    return layer
+
+
+@pytest.fixture
 def qgis_point_layer():
     layer = QgsVectorLayer("Point?crs=EPSG:3067", "Point Layer", "memory")
 
