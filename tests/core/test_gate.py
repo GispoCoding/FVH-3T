@@ -1,6 +1,7 @@
 from qgis.core import QgsGeometry, QgsPointXY, QgsUnitTypes
 
 from fvh3t.core.gate import Gate
+from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 
@@ -48,3 +49,51 @@ def test_geometry(two_point_gate, three_point_gate):
 def test_crosses_trajectory(two_point_gate, three_point_gate, two_node_trajectory):
     assert two_point_gate.crosses_trajectory(two_node_trajectory)
     assert not three_point_gate.crosses_trajectory(two_node_trajectory)
+
+
+def test_trajectory_crosses_topological(two_point_gate):
+    traj1 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 1000, 0, 0, 0),
+        ),
+    )
+
+    traj2 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 1, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0, 1000, 0, 0, 0),
+        ),
+    )
+
+    traj3 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, -1, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -0.5, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 2, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 3, 1000, 0, 0, 0),
+        ),
+    )
+
+    traj4 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 3, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 2, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 1000, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.5, 500, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -0.5, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, -1, 0, 0, 0, 0),
+        ),
+    )
+
+    two_point_gate.set_counts_left(state=False)
+
+    two_point_gate.count_trajectories([traj1, traj2, traj3, traj4])
+
+    assert two_point_gate.trajectory_count() == 2
