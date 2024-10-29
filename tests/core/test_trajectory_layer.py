@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import pytest
 from qgis.core import QgsUnitTypes
 
-from fvh3t.core.exceptions import InvalidLayerException
+from fvh3t.core.exceptions import InvalidLayerException, InvalidTrajectoryException
 from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 if TYPE_CHECKING:
@@ -137,6 +137,19 @@ def test_is_field_valid(qgis_point_layer_no_additional_fields, qgis_point_layer_
     with pytest.raises(InvalidLayerException, match="Timestamp field either not found or of incorrect type."):
         TrajectoryLayer(
             qgis_point_layer_wrong_type,
+            "id",
+            "timestamp",
+            "width",
+            "length",
+            "height",
+            QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        )
+
+
+def test_create_trajectory_layer_single_trajectory_node(qgis_single_point_layer):
+    with pytest.raises(InvalidTrajectoryException, match="Trajectory must consist of at least two nodes."):
+        TrajectoryLayer(
+            qgis_single_point_layer,
             "id",
             "timestamp",
             "width",

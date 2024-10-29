@@ -19,10 +19,11 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 
-from fvh3t.core.exceptions import InvalidLayerException
+from fvh3t.core.exceptions import InvalidLayerException, InvalidTrajectoryException
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 UNIX_TIMESTAMP_UNIT_THRESHOLD = 13
+N_NODES_MIN = 2
 
 
 def digits_in_timestamp_int(num: int):
@@ -151,6 +152,10 @@ class TrajectoryLayer:
                 nodes.append(
                     TrajectoryNode(point, datetime.fromtimestamp(timestamp, tz=timezone.utc), width, length, height)
                 )
+
+            if len(nodes) < N_NODES_MIN:
+                msg = "Trajectory must consist of at least two nodes."
+                raise InvalidTrajectoryException(msg)
 
             trajectories.append(Trajectory(tuple(nodes), self))
 

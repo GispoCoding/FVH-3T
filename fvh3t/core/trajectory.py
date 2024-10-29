@@ -12,10 +12,13 @@ from qgis.core import (
     QgsUnitTypes,
 )
 
+from fvh3t.core.exceptions import InvalidTrajectoryException
 from fvh3t.core.trajectory_segment import TrajectorySegment
 
 if TYPE_CHECKING:
     from fvh3t.core.trajectory_layer import TrajectoryLayer
+
+N_NODES_MIN = 2
 
 
 class TrajectoryNode(NamedTuple):
@@ -56,6 +59,10 @@ class Trajectory:
     """
 
     def __init__(self, nodes: tuple[TrajectoryNode, ...], layer: TrajectoryLayer | None = None) -> None:
+        if len(nodes) < N_NODES_MIN:
+            msg = "Trajectory must consist of at least two nodes."
+            raise InvalidTrajectoryException(msg)
+
         self.__nodes: tuple[TrajectoryNode, ...] = nodes
         self.__layer: TrajectoryLayer | None = layer
 
