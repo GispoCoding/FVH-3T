@@ -19,3 +19,7 @@ class InvalidTrajectoryException(QgsPluginException):
 
 class InvalidFeatureException(QgsPluginException):
     pass
+
+
+class InvalidSegmentException(QgsPluginException):
+    pass
