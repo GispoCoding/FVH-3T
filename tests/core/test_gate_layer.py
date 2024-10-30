@@ -1,7 +1,9 @@
 import pytest
+from qgis.core import QgsFeature, QgsGeometry, QgsPointXY
 
 from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.gate_layer import GateLayer
+from fvh3t.core.line_layer import create_line_layer
 
 
 def test_gate_layer_create_gates(qgis_gate_line_layer):
@@ -51,3 +53,41 @@ def test_is_field_valid(qgis_gate_line_layer, qgis_gate_line_layer_wrong_field_t
             "counts_left",
             "counts_right",
         )
+
+
+def test_create_valid_gate_from_empty_line_layer():
+    layer = create_line_layer()
+
+    layer.startEditing()
+
+    gate = QgsFeature(layer.fields())
+    gate.setAttributes([True, True])
+    gate.setGeometry(
+        QgsGeometry.fromPolylineXY(
+            [
+                QgsPointXY(0, 0),
+                QgsPointXY(0, 1),
+            ]
+        )
+    )
+
+    layer.addFeature(gate)
+
+    layer.commitChanges()
+
+    gate_layer = GateLayer(
+        layer,
+        "counts_left",
+        "counts_right",
+    )
+
+    gates = gate_layer.gates()
+
+    assert len(gates) == 1
+
+    gate = gates[0]
+
+    assert gate.geometry().asWkt() == "LineString (0 0, 0 1)"
+    assert gate.counts_left()
+    assert gate.counts_right()
+    assert len(gate.segments()) == 1
