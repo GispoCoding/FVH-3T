@@ -235,8 +235,11 @@ class TrajectoryLayer:
             return True
 
         field: QgsField = self.__layer.fields().field(field_id)
-        field_type: str = field.displayType()
 
+        if "numeric" in accepted_types and field.isNumeric():
+            return True
+
+        field_type: str = field.displayType()
         return field_type in accepted_types
 
     def is_valid(self) -> bool:
@@ -259,19 +262,19 @@ class TrajectoryLayer:
             msg = "Id field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__timestamp_field, accepted_types=["integer", "double"]):
+        if not self.is_field_valid(self.__timestamp_field, accepted_types=["numeric"]):
             msg = "Timestamp field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__width_field, accepted_types=["integer", "double"]):
+        if not self.is_field_valid(self.__width_field, accepted_types=["numeric"]):
             msg = "Width field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__length_field, accepted_types=["integer", "double"]):
+        if not self.is_field_valid(self.__length_field, accepted_types=["numeric"]):
             msg = "Length field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__height_field, accepted_types=["integer", "double"]):
+        if not self.is_field_valid(self.__height_field, accepted_types=["numeric"]):
             msg = "Height field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
