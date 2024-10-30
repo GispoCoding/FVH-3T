@@ -4,7 +4,6 @@ from qgis.core import QgsField, QgsVectorLayer
 from qgis.PyQt.QtCore import QVariant
 
 
-# TODO: Tässä ei tarvii muuta kuin luoda tyhjä viivataso. Lisäksi, lisää style (katso issue!)
 def create_line_layer() -> QgsVectorLayer:
     layer = QgsVectorLayer("LineString?crs=EPSG:3067", "Line Layer", "memory")
 
