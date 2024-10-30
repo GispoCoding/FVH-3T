@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from qgis.core import QgsCoordinateReferenceSystem
+
 if TYPE_CHECKING:
     from fvh3t.core.trajectory_segment import TrajectorySegment
 
@@ -42,3 +44,7 @@ def test_trajectory_as_segments(two_node_trajectory, three_node_trajectory):
 
 def test_trajectory_segment_as_geometry(trajectory_segment):
     assert trajectory_segment.as_geometry().asWkt() == "LineString (0 0, 0 1)"
+
+
+def test_trajectory_segment_speed(trajectory_segment):
+    assert trajectory_segment.speed(QgsCoordinateReferenceSystem("EPSG:3067")) == 3.6
