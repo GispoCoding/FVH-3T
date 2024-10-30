@@ -1,14 +1,14 @@
 from qgis.core import QgsProcessingProvider
 
-from fvh3t.fvh3t_processing.processing_algorithm import ProcessingAlgorithm
+from fvh3t.fvh3t_processing.count_trajectories import CountTrajectories
 
 
 class Provider(QgsProcessingProvider):
     def __init__(self) -> None:
         super().__init__()
 
-        self._id = "myprovider"
-        self._name = "My provider"
+        self._id = "traffic_trajectory_toolkit_provider"
+        self._name = "Traffic trajectory toolkit provider"
 
     def id(self) -> str:
         """The ID of your plugin, used to identify the provider.
@@ -40,5 +40,5 @@ class Provider(QgsProcessingProvider):
         """
         Adds individual processing algorithms to the provider.
         """
-        alg = ProcessingAlgorithm()
+        alg = CountTrajectories()
         self.addAlgorithm(alg)
