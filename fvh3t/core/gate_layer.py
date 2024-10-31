@@ -13,37 +13,37 @@ class GateLayer:
     can be instantiated, i.e.
 
     1. is a line layer
-    2. has a valid "counts left" field
-    2. has a valid "counts right" field
+    2. has a valid "counts negative" field
+    2. has a valid "counts positive" field
     """
 
     def __init__(
         self,
         layer: QgsVectorLayer,
-        counts_left_field: str,
-        counts_right_field: str,
+        counts_negative_field: str,
+        counts_positive_field: str,
     ) -> None:
         self.__layer: QgsVectorLayer = layer
-        self.__counts_left_field = counts_left_field
-        self.__counts_right_field = counts_right_field
+        self.__counts_negative_field = counts_negative_field
+        self.__counts_positive_field = counts_positive_field
 
         if self.is_valid():
             self.__gates: tuple[Gate, ...] = ()
             self.create_gates()
 
     def create_gates(self) -> None:
-        counts_left_field_idx: int = self.__layer.fields().indexOf(self.__counts_left_field)
-        counts_right_field_idx: int = self.__layer.fields().indexOf(self.__counts_right_field)
+        counts_negative_field_idx: int = self.__layer.fields().indexOf(self.__counts_negative_field)
+        counts_positive_field_idx: int = self.__layer.fields().indexOf(self.__counts_positive_field)
 
         # TODO: Check that these are bool fields
 
         gates: list[Gate] = []
 
         for feature in self.__layer.getFeatures():
-            counts_left: bool = feature[counts_left_field_idx]
-            counts_right: bool = feature[counts_right_field_idx]
+            counts_negative: bool = feature[counts_negative_field_idx]
+            counts_positive: bool = feature[counts_positive_field_idx]
 
-            gate = Gate(feature.geometry(), counts_left=counts_left, counts_right=counts_right)
+            gate = Gate(feature.geometry(), counts_negative=counts_negative, counts_positive=counts_positive)
 
             gates.append(gate)
 
@@ -58,8 +58,8 @@ class GateLayer:
         line_layer.startEditing()
 
         line_layer.addAttribute(QgsField("fid", QVariant.Int))
-        line_layer.addAttribute(QgsField("counts_left", QVariant.Bool))
-        line_layer.addAttribute(QgsField("counts_right", QVariant.Bool))
+        line_layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
+        line_layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
         line_layer.addAttribute(QgsField("trajectory_count", QVariant.Int))
 
         fields = line_layer.fields()
@@ -70,8 +70,8 @@ class GateLayer:
             feature.setAttributes(
                 [
                     i,
-                    gate.counts_left(),
-                    gate.counts_right(),
+                    gate.counts_negative(),
+                    gate.counts_positive(),
                     gate.trajectory_count(),
                 ]
             )
@@ -121,12 +121,12 @@ class GateLayer:
             msg = "Layer has no features."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__counts_left_field, accepted_types=[QMetaType.Type.Bool]):
-            msg = "Counts left field either not found or of incorrect type."
+        if not self.is_field_valid(self.__counts_negative_field, accepted_types=[QMetaType.Type.Bool]):
+            msg = "Counts negative field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__counts_right_field, accepted_types=[QMetaType.Type.Bool]):
-            msg = "Counts right field either not found or of incorrect type."
+        if not self.is_field_valid(self.__counts_positive_field, accepted_types=[QMetaType.Type.Bool]):
+            msg = "Counts positive field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
         return True

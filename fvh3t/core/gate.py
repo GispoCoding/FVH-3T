@@ -20,7 +20,7 @@ class Gate:
     must be a line.
     """
 
-    def __init__(self, geom: QgsGeometry, *, counts_left: bool = False, counts_right: bool = False) -> None:
+    def __init__(self, geom: QgsGeometry, *, counts_negative: bool = False, counts_positive: bool = False) -> None:
         if geom.type() != QgsWkbTypes.GeometryType.LineGeometry:
             msg = "Gate must be created from a line geometry!"
             raise InvalidGeometryTypeException(msg)
@@ -28,23 +28,23 @@ class Gate:
         self.__geom: QgsGeometry = geom
         self.__trajectory_count: int = 0
 
-        self.__counts_left: bool = counts_left
-        self.__counts_right: bool = counts_right
+        self.__counts_negative: bool = counts_negative
+        self.__counts_positive: bool = counts_positive
 
         self.__average_speed: float = 0.0
 
-        if not counts_left and not counts_right:
+        if not counts_negative and not counts_positive:
             msg = "Gate has to count at least one direction!"
             raise InvalidDirectionException(msg)
 
         self.__segments: tuple[GateSegment, ...] = ()
         self.create_segments()
 
-    def set_counts_left(self, *, state: bool) -> None:
-        self.__counts_left = state
+    def set_counts_negative(self, *, state: bool) -> None:
+        self.__counts_negative = state
 
-    def set_counts_right(self, *, state: bool) -> None:
-        self.__counts_right = state
+    def set_counts_positive(self, *, state: bool) -> None:
+        self.__counts_positive = state
 
     def geometry(self) -> QgsGeometry:
         return self.__geom
@@ -55,11 +55,11 @@ class Gate:
     def average_speed(self) -> float:
         return self.__average_speed
 
-    def counts_left(self) -> bool:
-        return self.__counts_left
+    def counts_negative(self) -> bool:
+        return self.__counts_negative
 
-    def counts_right(self) -> bool:
-        return self.__counts_right
+    def counts_positive(self) -> bool:
+        return self.__counts_positive
 
     def segments(self) -> tuple[GateSegment, ...]:
         return self.__segments
@@ -103,8 +103,8 @@ class Gate:
                         crosses: bool = gate_segment.trajectory_segment_crosses(
                             traj_seg,
                             previous_traj_seg,
-                            counts_left=self.__counts_left,
-                            counts_right=self.__counts_right,
+                            counts_negative=self.__counts_negative,
+                            counts_positive=self.__counts_positive,
                         )
                         if crosses:
                             self.__trajectory_count += 1

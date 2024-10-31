@@ -224,7 +224,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
         # TODO: Remove later
         feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
 
-        gate_layer = GateLayer(line_layer, "counts_left", "counts_right")
+        gate_layer = GateLayer(line_layer, "counts_negative", "counts_positive")
 
         gates = gate_layer.gates()
 
