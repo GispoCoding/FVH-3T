@@ -67,7 +67,7 @@ class GateLayer:
             return True
 
         field: QgsField = self.__layer.fields().field(field_id)
-        field_type: str = field.type()
+        field_type: QMetaType.Type = field.type()
 
         return field_type in accepted_types
 
