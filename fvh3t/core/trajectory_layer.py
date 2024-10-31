@@ -17,13 +17,27 @@ from qgis.core import (
     QgsVectorLayer,
     QgsWkbTypes,
 )
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType, QVariant
 
 from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException, InvalidTrajectoryException
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
 
 UNIX_TIMESTAMP_UNIT_THRESHOLD = 13
 N_NODES_MIN = 2
+QT_NUMERIC_TYPES = [
+    QMetaType.Type.Int,
+    QMetaType.Type.UInt,
+    QMetaType.Type.Double,
+    QMetaType.Type.Long,
+    QMetaType.Type.LongLong,
+    QMetaType.Type.ULong,
+    QMetaType.Type.ULongLong,
+    QMetaType.Type.Short,
+    QMetaType.Type.UShort,
+    QMetaType.Type.SChar,
+    QMetaType.Type.UChar,
+    QMetaType.Type.Float,
+]
 
 
 def digits_in_timestamp_int(num: int):
@@ -220,7 +234,7 @@ class TrajectoryLayer:
 
         return line_layer
 
-    def is_field_valid(self, field_name: str, *, accepted_types: list[str]) -> bool:
+    def is_field_valid(self, field_name: str, *, accepted_types: list[QMetaType.Type]) -> bool:
         """
         Check that a field 1) exists and 2) has an
         acceptable type. Leave type list empty to
@@ -235,11 +249,8 @@ class TrajectoryLayer:
             return True
 
         field: QgsField = self.__layer.fields().field(field_id)
+        field_type: str = field.type()
 
-        if "numeric" in accepted_types and field.isNumeric():
-            return True
-
-        field_type: str = field.displayType()
         return field_type in accepted_types
 
     def is_valid(self) -> bool:
@@ -262,19 +273,19 @@ class TrajectoryLayer:
             msg = "Id field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__timestamp_field, accepted_types=["numeric"]):
+        if not self.is_field_valid(self.__timestamp_field, accepted_types=QT_NUMERIC_TYPES):
             msg = "Timestamp field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__width_field, accepted_types=["numeric"]):
+        if not self.is_field_valid(self.__width_field, accepted_types=QT_NUMERIC_TYPES):
             msg = "Width field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__length_field, accepted_types=["numeric"]):
+        if not self.is_field_valid(self.__length_field, accepted_types=QT_NUMERIC_TYPES):
             msg = "Length field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__height_field, accepted_types=["numeric"]):
+        if not self.is_field_valid(self.__height_field, accepted_types=QT_NUMERIC_TYPES):
             msg = "Height field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 

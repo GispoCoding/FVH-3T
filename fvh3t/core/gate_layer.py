@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from qgis.core import QgsFeatureSource, QgsField, QgsVectorLayer, QgsWkbTypes
+from qgis.PyQt.QtCore import QMetaType
 
 from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.gate import Gate
@@ -51,7 +52,7 @@ class GateLayer:
     def gates(self) -> tuple[Gate, ...]:
         return self.__gates
 
-    def is_field_valid(self, field_name: str, *, accepted_types: list[str]) -> bool:
+    def is_field_valid(self, field_name: str, *, accepted_types: list[QMetaType.Type]) -> bool:
         """
         Check that a field 1) exists and 2) has an
         acceptable type. Leave type list empty to
@@ -66,11 +67,8 @@ class GateLayer:
             return True
 
         field: QgsField = self.__layer.fields().field(field_id)
+        field_type: str = field.type()
 
-        if "numeric" in accepted_types and field.isNumeric():
-            return True
-
-        field_type: str = field.displayType()
         return field_type in accepted_types
 
     def is_valid(self) -> bool:
@@ -89,11 +87,11 @@ class GateLayer:
             msg = "Layer has no features."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__counts_left_field, accepted_types=["boolean"]):
+        if not self.is_field_valid(self.__counts_left_field, accepted_types=[QMetaType.Type.Bool]):
             msg = "Counts left field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
-        if not self.is_field_valid(self.__counts_right_field, accepted_types=["boolean"]):
+        if not self.is_field_valid(self.__counts_right_field, accepted_types=[QMetaType.Type.Bool]):
             msg = "Counts right field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
