@@ -97,3 +97,46 @@ def test_trajectory_crosses_topological(two_point_gate):
     two_point_gate.count_trajectories([traj1, traj2, traj3, traj4])
 
     assert two_point_gate.trajectory_count() == 2
+
+
+def test_calculate_two_point_gate_average_speed(two_point_gate):
+    two_point_gate.set_counts_left(state=False)
+
+    traj1 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 100, 0, 0, 0),
+        )
+    )
+
+    traj2 = Trajectory(
+        (TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0), TrajectoryNode.from_coordinates(0, 1, 200, 0, 0, 0))
+    )
+
+    two_point_gate.count_trajectories([traj1, traj2])
+
+    assert two_point_gate.trajectory_count() == 2
+    assert two_point_gate.average_speed() == 27.0
+
+
+def test_calculate_three_point_gate_average_speed(three_point_gate):
+    three_point_gate.set_counts_left(state=False)
+
+    traj1 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(1.5, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(1.5, 2, 100, 0, 0, 0),
+        )
+    )
+
+    traj2 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(3, 1.5, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(1, 1.5, 200, 0, 0, 0),
+        )
+    )
+
+    three_point_gate.count_trajectories([traj1, traj2])
+
+    assert three_point_gate.trajectory_count() == 2
+    assert three_point_gate.average_speed() == 54.0
