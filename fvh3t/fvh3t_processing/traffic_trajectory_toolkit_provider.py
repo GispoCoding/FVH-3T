@@ -7,8 +7,8 @@ class Provider(QgsProcessingProvider):
     def __init__(self) -> None:
         super().__init__()
 
-        self._id = "traffic_trajectory_toolkit_provider"
-        self._name = "Traffic trajectory toolkit provider"
+        self._id = "traffic_trajectory_toolkit"
+        self._name = "Traffic trajectory toolkit"
 
     def id(self) -> str:
         """The ID of your plugin, used to identify the provider.
