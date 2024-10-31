@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from qgis.core import QgsFeatureSource, QgsField, QgsVectorLayer, QgsWkbTypes
-from qgis.PyQt.QtCore import QMetaType
+from qgis.core import QgsFeature, QgsFeatureSource, QgsField, QgsVectorLayer, QgsWkbTypes
+from qgis.PyQt.QtCore import QMetaType, QVariant
 
-from fvh3t.core.exceptions import InvalidLayerException
+from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException
 from fvh3t.core.gate import Gate
 
 
@@ -51,6 +51,40 @@ class GateLayer:
 
     def gates(self) -> tuple[Gate, ...]:
         return self.__gates
+
+    def as_line_layer(self) -> QgsVectorLayer | None:
+        line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
+
+        line_layer.startEditing()
+
+        line_layer.addAttribute(QgsField("fid", QVariant.Int))
+        line_layer.addAttribute(QgsField("counts_left", QVariant.Bool))
+        line_layer.addAttribute(QgsField("counts_right", QVariant.Bool))
+        line_layer.addAttribute(QgsField("trajectory_count", QVariant.Int))
+
+        fields = line_layer.fields()
+
+        for i, gate in enumerate(self.__gates):
+            feature = QgsFeature(fields)
+
+            feature.setAttributes(
+                [
+                    i,
+                    gate.counts_left(),
+                    gate.counts_right(),
+                    gate.trajectory_count(),
+                ]
+            )
+            feature.setGeometry(gate.geometry())
+
+            if not feature.isValid():
+                raise InvalidFeatureException
+
+            line_layer.addFeature(feature)
+
+        line_layer.commitChanges()
+
+        return line_layer
 
     def is_field_valid(self, field_name: str, *, accepted_types: list[QMetaType.Type]) -> bool:
         """
