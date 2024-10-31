@@ -17,6 +17,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QCoreApplication
 
+from fvh3t.core.gate_layer import GateLayer
 from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 
@@ -85,7 +86,6 @@ class CountTrajectories(QgsProcessingAlgorithm):
                 name=self.OUTPUT_GATES,
                 description="Gates",
                 type=QgsProcessing.TypeVectorLine,
-                optional=True,
             )
         )
 
@@ -112,9 +112,10 @@ class CountTrajectories(QgsProcessingAlgorithm):
             feedback = QgsProcessingFeedback()
 
         point_layer = self.parameterAsVectorLayer(parameters, self.INPUT_POINTS, context)
-        # line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
         start_time = self.parameterAsDateTime(parameters, self.START_TIME, context)
         end_time = self.parameterAsDateTime(parameters, self.END_TIME, context)
+
+        ## CREATE TRAJECTORIES
 
         # TODO: Remove later
         feedback.pushInfo(f"Original point layer has {point_layer.featureCount()} features.")
@@ -167,6 +168,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
                     id_count[feature_id] = 0
                 id_count[feature_id] += 1
 
+        # TODO: Remove later
         feedback.pushInfo(f"Filtered {filtered_layer.featureCount()} features based on timestamp range.")
 
         # Prepare another memory layer for features with non-unique id after filtering time
@@ -183,6 +185,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
                 new_feature = QgsFeature(feature)
                 non_unique_layer.dataProvider().addFeature(new_feature)
 
+        # TODO: Remove later
         feedback.pushInfo(
             f"Final filtered layer contains {non_unique_layer.featureCount()} features with non-unique IDs."
         )
@@ -195,22 +198,55 @@ class CountTrajectories(QgsProcessingAlgorithm):
             "size_y",
             "size_z",
             QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
-        ).as_line_layer()
+        )
 
-        if trajectory_layer is None:
+        exported_traj_layer = trajectory_layer.as_line_layer()
+
+        if exported_traj_layer is None:
             msg = "Trajectory layer is None."
             raise ValueError(msg)
 
-        (sink, dest_id) = self.parameterAsSink(
+        (sink, traj_dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT_TRAJECTORIES,
             context,
-            trajectory_layer.fields(),
-            trajectory_layer.wkbType(),
-            trajectory_layer.sourceCrs(),
+            exported_traj_layer.fields(),
+            exported_traj_layer.wkbType(),
+            exported_traj_layer.sourceCrs(),
         )
 
-        for feature in trajectory_layer.getFeatures():
+        for feature in exported_traj_layer.getFeatures():
+            sink.addFeature(feature, QgsFeatureSink.FastInsert)
+
+        # CREATE GATES
+        line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
+
+        # TODO: Remove later
+        feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
+
+        gate_layer = GateLayer(line_layer, "counts_left", "counts_right")
+
+        gates = gate_layer.gates()
+
+        for gate in gates:
+            gate.count_trajectories_from_layer(trajectory_layer)
+
+        exported_gate_layer = gate_layer.as_line_layer()
+
+        if exported_gate_layer is None:
+            msg = "Gate layer is None"
+            raise ValueError(msg)
+
+        (sink, gate_dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT_GATES,
+            context,
+            exported_gate_layer.fields(),
+            exported_gate_layer.wkbType(),
+            exported_gate_layer.sourceCrs(),
+        )
+
+        for feature in exported_gate_layer.getFeatures():
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
         # Return the results of the algorithm. In this case our only result is
@@ -219,4 +255,4 @@ class CountTrajectories(QgsProcessingAlgorithm):
         # statistics, etc. These should all be included in the returned
         # dictionary, with keys matching the feature corresponding parameter
         # or output names.
-        return {self.OUTPUT_TRAJECTORIES: dest_id}
+        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_GATES: gate_dest_id}
