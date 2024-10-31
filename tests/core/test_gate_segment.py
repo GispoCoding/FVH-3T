@@ -132,14 +132,14 @@ def test_trajectory_segment_crosses():
         TrajectoryNode.from_coordinates(1, 1.5, 1000, 1, 1, 1),
     )
 
-    assert gate_seg1.trajectory_segment_crosses(traj_seg1, counts_right=True, counts_left=False)
-    assert gate_seg1.trajectory_segment_crosses(traj_seg2, counts_left=True, counts_right=True)
-    assert not gate_seg1.trajectory_segment_crosses(traj_seg3, counts_right=True, counts_left=True)
+    assert gate_seg1.trajectory_segment_crosses(traj_seg1, counts_positive=True, counts_negative=False)
+    assert gate_seg1.trajectory_segment_crosses(traj_seg2, counts_negative=True, counts_positive=True)
+    assert not gate_seg1.trajectory_segment_crosses(traj_seg3, counts_positive=True, counts_negative=True)
 
-    assert not gate_seg2.trajectory_segment_crosses(traj_seg1, counts_left=True, counts_right=False)
-    assert gate_seg2.trajectory_segment_crosses(traj_seg2, counts_right=True, counts_left=True)
-    assert not gate_seg2.trajectory_segment_crosses(traj_seg3, counts_left=True, counts_right=False)
+    assert not gate_seg2.trajectory_segment_crosses(traj_seg1, counts_negative=True, counts_positive=False)
+    assert gate_seg2.trajectory_segment_crosses(traj_seg2, counts_positive=True, counts_negative=True)
+    assert not gate_seg2.trajectory_segment_crosses(traj_seg3, counts_negative=True, counts_positive=False)
 
-    assert gate_seg3.trajectory_segment_crosses(traj_seg1, counts_left=True, counts_right=False)
-    assert gate_seg3.trajectory_segment_crosses(traj_seg2, counts_right=True, counts_left=False)
-    assert gate_seg3.trajectory_segment_crosses(traj_seg3, counts_left=True, counts_right=False)
+    assert gate_seg3.trajectory_segment_crosses(traj_seg1, counts_negative=True, counts_positive=False)
+    assert gate_seg3.trajectory_segment_crosses(traj_seg2, counts_positive=True, counts_negative=False)
+    assert gate_seg3.trajectory_segment_crosses(traj_seg3, counts_negative=True, counts_positive=False)
