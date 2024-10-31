@@ -40,7 +40,7 @@ class TrajectorySegment:
             distance_m = da.convertLengthMeasurement(distance_m, QgsUnitTypes.DistanceUnit.DistanceMeters)
 
         time_difference: timedelta = self.node_b.timestamp - self.node_a.timestamp
-        seconds: float = distance_m / time_difference.total_seconds()
+        seconds: float = time_difference.total_seconds()
 
         if seconds > 0:
             meters_per_second = distance_m / seconds
