@@ -66,8 +66,8 @@ def size_changing_trajectory():
 def two_point_gate():
     return Gate(
         QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)]),
-        counts_left=True,
-        counts_right=True,
+        counts_negative=True,
+        counts_positive=True,
     )
 
 
@@ -75,8 +75,8 @@ def two_point_gate():
 def three_point_gate():
     return Gate(
         QgsGeometry.fromPolylineXY([QgsPointXY(1, 1), QgsPointXY(2, 1), QgsPointXY(2, 2)]),
-        counts_left=True,
-        counts_right=True,
+        counts_negative=True,
+        counts_positive=True,
     )
 
 
@@ -328,8 +328,8 @@ def qgis_gate_line_layer():
 
     layer.startEditing()
 
-    layer.addAttribute(QgsField("counts_left", QVariant.Bool))
-    layer.addAttribute(QgsField("counts_right", QVariant.Bool))
+    layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
+    layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
 
     gate1 = QgsFeature(layer.fields())
     gate1.setAttributes([True, True])
@@ -383,8 +383,8 @@ def qgis_gate_line_layer_wrong_field_type():
 
     layer.startEditing()
 
-    layer.addAttribute(QgsField("counts_left", QVariant.Bool))
-    layer.addAttribute(QgsField("counts_right", QVariant.Int))
+    layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
+    layer.addAttribute(QgsField("counts_positive", QVariant.Int))
 
     gate = QgsFeature(layer.fields())
     gate.setAttributes([True, True])

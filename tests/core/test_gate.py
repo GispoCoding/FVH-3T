@@ -17,16 +17,16 @@ def test_trajectory_count(qgis_point_layer_for_gate_count):
     )
 
     geom1 = QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)])
-    gate1 = Gate(geom1, counts_right=True)
+    gate1 = Gate(geom1, counts_positive=True)
 
     geom2 = QgsGeometry.fromPolylineXY([QgsPointXY(-1, 0.75), QgsPointXY(1, 1)])
-    gate2 = Gate(geom2, counts_left=True)
+    gate2 = Gate(geom2, counts_negative=True)
 
     geom3 = QgsGeometry.fromPolylineXY([QgsPointXY(0.5, 0), QgsPointXY(-0.75, 2)])
-    gate3 = Gate(geom3, counts_left=True, counts_right=True)
+    gate3 = Gate(geom3, counts_negative=True, counts_positive=True)
 
     geom4 = QgsGeometry.fromPolylineXY([QgsPointXY(-1, -0.5), QgsPointXY(1, -0.5)])
-    gate4 = Gate(geom4, counts_left=True, counts_right=True)
+    gate4 = Gate(geom4, counts_negative=True, counts_positive=True)
 
     gate1.count_trajectories_from_layer(traj_layer)
     assert gate1.trajectory_count() == 1
@@ -92,7 +92,7 @@ def test_trajectory_crosses_topological(two_point_gate):
         ),
     )
 
-    two_point_gate.set_counts_left(state=False)
+    two_point_gate.set_counts_negative(state=False)
 
     two_point_gate.count_trajectories([traj1, traj2, traj3, traj4])
 
@@ -100,7 +100,7 @@ def test_trajectory_crosses_topological(two_point_gate):
 
 
 def test_calculate_two_point_gate_average_speed(two_point_gate):
-    two_point_gate.set_counts_left(state=False)
+    two_point_gate.set_counts_negative(state=False)
 
     traj1 = Trajectory(
         (
@@ -120,7 +120,7 @@ def test_calculate_two_point_gate_average_speed(two_point_gate):
 
 
 def test_calculate_three_point_gate_average_speed(three_point_gate):
-    three_point_gate.set_counts_left(state=False)
+    three_point_gate.set_counts_negative(state=False)
 
     traj1 = Trajectory(
         (
