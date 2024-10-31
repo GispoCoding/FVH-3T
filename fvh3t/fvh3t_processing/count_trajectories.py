@@ -59,9 +59,8 @@ class CountTrajectories(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 name=self.INPUT_LINES,
-                description="Input line layer",
+                description="Gates",
                 types=[QgsProcessing.TypeVectorLine],
-                optional=True,
             )
         )
 
@@ -117,28 +116,19 @@ class CountTrajectories(QgsProcessingAlgorithm):
 
         ## CREATE TRAJECTORIES
 
-        # TODO: Remove later
         feedback.pushInfo(f"Original point layer has {point_layer.featureCount()} features.")
 
         # Get min and max timestamps from the data
-        min_timestamp = None
-        max_timestamp = None
-
-        for feature in point_layer.getFeatures():
-            timestamp = feature["timestamp"]
-
-            if min_timestamp is None or timestamp < min_timestamp:
-                min_timestamp = timestamp
-            if max_timestamp is None or timestamp > max_timestamp:
-                max_timestamp = timestamp
+        timestamp_field_id = point_layer.fields().indexOf("timestamp")
+        min_timestamp, max_timestamp = point_layer.minimumAndMaximumValue(timestamp_field_id)
 
         if min_timestamp is None or max_timestamp is None:
             msg = "No valid timestamps found in the point layer."
             raise ValueError(msg)
 
         # Check if start and end times are empty. If yes, use min and max timestamps. If not, convert to unix time.
-        start_time_unix = start_time.toSecsSinceEpoch() * 1000 if start_time.isValid() else min_timestamp
-        end_time_unix = end_time.toSecsSinceEpoch() * 1000 if end_time.isValid() else max_timestamp
+        start_time_unix = start_time.toMSecsSinceEpoch() if start_time.isValid() else min_timestamp
+        end_time_unix = end_time.toMSecsSinceEpoch() if end_time.isValid() else max_timestamp
 
         # Check that the set start and end times are in data's range
         if not (min_timestamp <= start_time_unix <= max_timestamp) or not (
@@ -168,7 +158,6 @@ class CountTrajectories(QgsProcessingAlgorithm):
                     id_count[feature_id] = 0
                 id_count[feature_id] += 1
 
-        # TODO: Remove later
         feedback.pushInfo(f"Filtered {filtered_layer.featureCount()} features based on timestamp range.")
 
         # Prepare another memory layer for features with non-unique id after filtering time
@@ -185,9 +174,8 @@ class CountTrajectories(QgsProcessingAlgorithm):
                 new_feature = QgsFeature(feature)
                 non_unique_layer.dataProvider().addFeature(new_feature)
 
-        # TODO: Remove later
         feedback.pushInfo(
-            f"Final filtered layer contains {non_unique_layer.featureCount()} features with non-unique IDs."
+            f"Final filtered point layer contains {non_unique_layer.featureCount()} features with non-unique IDs."
         )
 
         trajectory_layer = TrajectoryLayer(
@@ -221,7 +209,6 @@ class CountTrajectories(QgsProcessingAlgorithm):
         # CREATE GATES
         line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
 
-        # TODO: Remove later
         feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
 
         gate_layer = GateLayer(line_layer, "counts_negative", "counts_positive")
