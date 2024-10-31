@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from fvh3t.core.trajectory import Trajectory, TrajectorySegment
     from fvh3t.core.trajectory_layer import TrajectoryLayer
 
-from qgis.core import QgsGeometry, QgsPointXY, QgsWkbTypes
+from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsPointXY, QgsWkbTypes
 
 from fvh3t.core.gate_segment import GateSegment
 
@@ -31,6 +31,8 @@ class Gate:
         self.__counts_left: bool = counts_left
         self.__counts_right: bool = counts_right
 
+        self.__average_speed: float = 0.0
+
         if not counts_left and not counts_right:
             msg = "Gate has to count at least one direction!"
             raise InvalidDirectionException(msg)
@@ -49,6 +51,9 @@ class Gate:
 
     def trajectory_count(self) -> int:
         return self.__trajectory_count
+
+    def average_speed(self) -> float:
+        return self.__average_speed
 
     def counts_left(self) -> bool:
         return self.__counts_left
@@ -77,7 +82,11 @@ class Gate:
     def count_trajectories_from_layer(self, layer: TrajectoryLayer) -> None:
         self.count_trajectories(layer.trajectories())
 
-    def count_trajectories(self, trajectories: tuple[Trajectory, ...]) -> None:
+    def count_trajectories(
+        self, trajectories: tuple[Trajectory, ...], trajectory_layer: TrajectoryLayer | None = None
+    ) -> None:
+        speed = 0.0
+        crs = trajectory_layer.crs() if trajectory_layer else QgsCoordinateReferenceSystem("EPSG:3067")
         for trajectory in trajectories:
             # check if geometries cross at all before
             # checking which specific segments cross
@@ -99,3 +108,6 @@ class Gate:
                         )
                         if crosses:
                             self.__trajectory_count += 1
+                            speed += traj_seg.speed(crs)
+        if self.trajectory_count() > 0:
+            self.__average_speed = speed / self.trajectory_count()
