@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingProvider
 from fvh3t.fvh3t_processing.count_trajectories import CountTrajectories
 
 
-class Provider(QgsProcessingProvider):
+class TTTProvider(QgsProcessingProvider):
     def __init__(self) -> None:
         super().__init__()
 
