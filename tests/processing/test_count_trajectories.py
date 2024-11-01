@@ -156,7 +156,10 @@ def input_point_layer_for_algorithm():
 
 
 def test_count_trajectories(
-    qgis_app, input_point_layer_for_algorithm: QgsVectorLayer, input_gate_layer_for_algorithm: QgsVectorLayer
+    qgis_app,
+    qgis_processing,  # noqa: ARG001
+    input_point_layer_for_algorithm: QgsVectorLayer,
+    input_gate_layer_for_algorithm: QgsVectorLayer,
 ):
     provider = TTTProvider()
 
