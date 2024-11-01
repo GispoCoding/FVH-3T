@@ -1,4 +1,8 @@
-import processing
+try:
+    import processing
+except ImportError:
+    from qgis import processing
+
 import pytest
 from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QTimeZone, QVariant
