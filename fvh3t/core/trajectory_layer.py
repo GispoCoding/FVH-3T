@@ -172,7 +172,7 @@ class TrajectoryLayer:
                 )
 
             if len(nodes) < N_NODES_MIN:
-                LOGGER.info('Trajectory with id "{%s}" has only one node, skipping...', str(identifier))
+                LOGGER.info('Trajectory with id "%s" has only one node, skipping...', str(identifier))
                 continue
 
             trajectories.append(Trajectory(tuple(nodes), self))
