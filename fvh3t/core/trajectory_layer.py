@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from logging import getLogger
 from math import log10
 from typing import Any
 
@@ -19,8 +20,9 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QMetaType, QVariant
 
-from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException, InvalidTrajectoryException
+from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
+from fvh3t.qgis_plugin_tools.tools.resources import plugin_name
 
 UNIX_TIMESTAMP_UNIT_THRESHOLD = 13
 N_NODES_MIN = 2
@@ -38,6 +40,8 @@ QT_NUMERIC_TYPES = [
     QMetaType.Type.UChar,
     QMetaType.Type.Float,
 ]
+
+LOGGER = getLogger(plugin_name())
 
 
 def digits_in_timestamp_int(num: int):
@@ -173,8 +177,8 @@ class TrajectoryLayer:
                 )
 
             if len(nodes) < N_NODES_MIN:
-                msg = "Trajectory must consist of at least two nodes."
-                raise InvalidTrajectoryException(msg)
+                LOGGER.info('Trajectory with id "%s" has only one node, skipping...', str(identifier))
+                continue
 
             trajectories.append(Trajectory(tuple(nodes), self))
 
