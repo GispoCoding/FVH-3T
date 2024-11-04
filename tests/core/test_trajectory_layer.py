@@ -2,7 +2,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import pytest
-from qgis.core import QgsUnitTypes
+from qgis.core import QgsUnitTypes, QgsVectorLayer
 
 from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.trajectory_layer import TrajectoryLayer
@@ -146,6 +146,40 @@ def test_is_field_valid(qgis_point_layer_no_additional_fields, qgis_point_layer_
             "height",
             QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
         )
+
+
+def test_create_trajectory_layer_extra_filter_expression(qgis_point_layer: QgsVectorLayer):
+    filter_expression = '"timestamp" BETWEEN 200 AND 600'
+
+    layer = TrajectoryLayer(
+        qgis_point_layer,
+        "id",
+        "timestamp",
+        "width",
+        "length",
+        "height",
+        QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
+        filter_expression,
+    )
+
+    trajectories = layer.trajectories()
+
+    assert len(trajectories) == 2
+
+    traj1 = trajectories[0]
+    traj2 = trajectories[1]
+
+    traj1nodes = traj1.nodes()
+    traj2nodes = traj2.nodes()
+
+    assert len(traj1nodes) == 2
+    assert len(traj2nodes) == 2
+
+    assert traj1nodes[0].timestamp.timestamp() == 0.2
+    assert traj1nodes[1].timestamp.timestamp() == 0.3
+
+    assert traj2nodes[0].timestamp.timestamp() == 0.5
+    assert traj2nodes[1].timestamp.timestamp() == 0.6
 
 
 def test_create_trajectory_layer_single_trajectory_node(qgis_single_point_layer, caplog):

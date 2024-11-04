@@ -70,6 +70,7 @@ class TrajectoryLayer:
         length_field: str,
         height_field: str,
         timestamp_unit: QgsUnitTypes.TemporalUnit = QgsUnitTypes.TemporalUnit.TemporalUnknownUnit,
+        extra_filter_expression: str | None = None,
     ) -> None:
         self.__layer: QgsVectorLayer = layer
         self.__id_field: str = id_field
@@ -99,7 +100,7 @@ class TrajectoryLayer:
                     self.__timestamp_units = QgsUnitTypes.TemporalUnit.TemporalSeconds
 
         self.__trajectories: tuple[Trajectory, ...] = ()
-        self.create_trajectories()
+        self.create_trajectories(extra_filter_expression)
 
         # TODO: should the class of traveler be handled here?
 
@@ -133,7 +134,7 @@ class TrajectoryLayer:
     def crs(self) -> QgsCoordinateReferenceSystem:
         return self.__layer.crs()
 
-    def create_trajectories(self) -> None:
+    def create_trajectories(self, filter_expression: str | None) -> None:
         id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
         timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
         width_field_idx: int = self.__layer.fields().indexOf(self.__width_field)
@@ -145,7 +146,11 @@ class TrajectoryLayer:
         trajectories: list[Trajectory] = []
 
         for identifier in unique_ids:
-            expression = QgsExpression(f'"{self.__id_field}" = {identifier}')
+            expression_str = f'("{self.__id_field}" = {identifier})'
+            if filter_expression:
+                expression_str += f" and ({filter_expression})"
+
+            expression = QgsExpression(expression_str)
             request = QgsFeatureRequest(expression)
 
             order_clause = QgsFeatureRequest.OrderByClause(self.__timestamp_field, ascending=True)
