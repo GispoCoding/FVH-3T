@@ -140,3 +140,28 @@ def test_calculate_three_point_gate_average_speed(three_point_gate):
 
     assert three_point_gate.trajectory_count() == 2
     assert three_point_gate.average_speed() == 54.0
+
+
+def test_calculate_average_acceleration(two_point_gate):
+    two_point_gate.set_counts_negative(state=False)
+
+    traj1 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.25, 100, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 200, 0, 0, 0),
+        )
+    )
+
+    traj2 = Trajectory(
+        (
+            TrajectoryNode.from_coordinates(0, 0, 0, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 0.25, 50, 0, 0, 0),
+            TrajectoryNode.from_coordinates(0, 1, 150, 0, 0, 0),
+        )
+    )
+
+    two_point_gate.count_trajectories([traj1, traj2])
+
+    assert two_point_gate.trajectory_count() == 2
+    assert round(two_point_gate.average_acceleration(), 2) == 20.83

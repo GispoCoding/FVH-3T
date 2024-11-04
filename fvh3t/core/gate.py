@@ -32,6 +32,7 @@ class Gate:
         self.__counts_positive: bool = counts_positive
 
         self.__average_speed: float = 0.0
+        self.__average_acceleration: float = 0.0
 
         if not counts_negative and not counts_positive:
             msg = "Gate has to count at least one direction!"
@@ -54,6 +55,9 @@ class Gate:
 
     def average_speed(self) -> float:
         return self.__average_speed
+
+    def average_acceleration(self) -> float:
+        return self.__average_acceleration
 
     def counts_negative(self) -> bool:
         return self.__counts_negative
@@ -86,6 +90,7 @@ class Gate:
         self, trajectories: tuple[Trajectory, ...], trajectory_layer: TrajectoryLayer | None = None
     ) -> None:
         speed = 0.0
+        acceleration = 0.0
         crs = trajectory_layer.crs() if trajectory_layer else QgsCoordinateReferenceSystem("EPSG:3067")
         for trajectory in trajectories:
             # check if geometries cross at all before
@@ -108,6 +113,20 @@ class Gate:
                         )
                         if crosses:
                             self.__trajectory_count += 1
-                            speed += traj_seg.speed(crs)
+                            current_speed = traj_seg.speed(crs)
+                            speed += current_speed
+
+                            if previous_traj_seg is not None:
+                                previous_speed = previous_traj_seg.speed(crs)
+
+                                # km/h -> m/s
+                                current_speed /= 3.6
+                                previous_speed /= 3.6
+
+                                acceleration += (current_speed - previous_speed) / (
+                                    traj_seg.node_b.timestamp - previous_traj_seg.node_a.timestamp
+                                ).total_seconds()
+
         if self.trajectory_count() > 0:
             self.__average_speed = speed / self.trajectory_count()
+            self.__average_acceleration = acceleration / self.trajectory_count()
