@@ -112,10 +112,9 @@ class CountTrajectories(QgsProcessingAlgorithm):
         start_time: QDateTime = self.parameterAsDateTime(parameters, self.START_TIME, context)
         end_time: QDateTime = self.parameterAsDateTime(parameters, self.END_TIME, context)
 
-        # TODO: Currently the datetime widget doesn't allow the user to set the seconds
-        # so normalize them to 0 seconds, because they are being set seemingly
-        # randomly leading to odd results. We need to check if selecting the time by
-        # minutes is OK and if not we might need to write a custom widget
+        # the datetime widget doesn't allow the user to set the seconds and they
+        # are being set seemingly randomly leading to odd results...
+        # so set 0 seconds manually
 
         zero_s_start_time = start_time.time()
         zero_s_start_time.setHMS(zero_s_start_time.hour(), zero_s_start_time.minute(), 0)

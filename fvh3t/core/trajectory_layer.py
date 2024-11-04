@@ -185,7 +185,6 @@ class TrajectoryLayer:
         self.__trajectories = tuple(trajectories)
 
     def as_line_layer(self) -> QgsVectorLayer | None:
-        # TODO: can this be a memory layer?
         line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
 
         line_layer.startEditing()

@@ -35,8 +35,6 @@ class GateLayer:
         counts_negative_field_idx: int = self.__layer.fields().indexOf(self.__counts_negative_field)
         counts_positive_field_idx: int = self.__layer.fields().indexOf(self.__counts_positive_field)
 
-        # TODO: Check that these are bool fields
-
         gates: list[Gate] = []
 
         for feature in self.__layer.getFeatures():
