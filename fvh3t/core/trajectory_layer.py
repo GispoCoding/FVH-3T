@@ -185,7 +185,8 @@ class TrajectoryLayer:
         self.__trajectories = tuple(trajectories)
 
     def as_line_layer(self) -> QgsVectorLayer | None:
-        line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
+        line_layer = QgsVectorLayer("LineString", "Line Layer", "memory")
+        line_layer.setCrs(self.__layer.crs())
 
         line_layer.startEditing()
 
