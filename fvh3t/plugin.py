@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QWidget
 from qgis.utils import iface
 
-from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import Provider
+from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import TTTProvider
 from fvh3t.qgis_plugin_tools.tools.custom_logging import setup_logger, teardown_logger
 from fvh3t.qgis_plugin_tools.tools.i18n import setup_translation
 from fvh3t.qgis_plugin_tools.tools.resources import plugin_name
@@ -103,7 +103,7 @@ class Plugin:
         return action
 
     def initProcessing(self):  # noqa N802
-        self.provider = Provider()
+        self.provider = TTTProvider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self) -> None:  # noqa N802
