@@ -68,6 +68,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
             QgsProcessingParameterString(
                 name=self.TRAVELER_CLASS,
                 description="Class of traveler",
+                optional=True,
             )
         )
 
@@ -161,6 +162,11 @@ class CountTrajectories(QgsProcessingAlgorithm):
         filter_expression: str | None = None
         if start_time_unix != min_timestamp or end_time_unix != max_timestamp:
             filter_expression = f'"timestamp" BETWEEN {start_time_unix} AND {end_time_unix}'
+        if not filter_expression:
+            if traveler_class:
+                filter_expression = f'"label" = {traveler_class}'
+        elif traveler_class:
+            filter_expression += f' AND "label" = {traveler_class}'
 
         trajectory_layer = TrajectoryLayer(
             point_layer,
