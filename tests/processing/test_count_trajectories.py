@@ -16,11 +16,12 @@ def input_gate_layer_for_algorithm():
 
     layer.startEditing()
 
+    layer.addAttribute(QgsField("name", QVariant.String))
     layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
     layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
 
     gate1 = QgsFeature(layer.fields())
-    gate1.setAttributes([True, False])
+    gate1.setAttributes(["gate1", True, False])
     gate1.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -31,7 +32,7 @@ def input_gate_layer_for_algorithm():
     )
 
     gate2 = QgsFeature(layer.fields())
-    gate2.setAttributes([False, True])
+    gate2.setAttributes(["gate2", False, True])
     gate2.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -42,7 +43,7 @@ def input_gate_layer_for_algorithm():
     )
 
     gate3 = QgsFeature(layer.fields())
-    gate3.setAttributes([True, True])
+    gate3.setAttributes(["gate3", True, True])
     gate3.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -73,61 +74,62 @@ def input_point_layer_for_algorithm():
     layer.addAttribute(QgsField("size_x", QVariant.Int))
     layer.addAttribute(QgsField("size_y", QVariant.Int))
     layer.addAttribute(QgsField("size_z", QVariant.Int))
+    layer.addAttribute(QgsField("label", QVariant.String))
 
     traj1_f1 = QgsFeature(layer.fields())
-    traj1_f1.setAttributes([1, 0, 1, 1, 1])
+    traj1_f1.setAttributes([1, 0, 1, 1, 1, "car"])
     traj1_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 1.5)))
 
     traj1_f2 = QgsFeature(layer.fields())
-    traj1_f2.setAttributes([1, 1000, 2, 2, 2])
+    traj1_f2.setAttributes([1, 1000, 2, 2, 2, "car"])
     traj1_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.5, 1.5)))
 
     traj1_f3 = QgsFeature(layer.fields())
-    traj1_f3.setAttributes([1, 2000, 1, 1, 1])
+    traj1_f3.setAttributes([1, 2000, 1, 1, 1, "car"])
     traj1_f3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-0.5, 1.5)))
 
     traj1_f4 = QgsFeature(layer.fields())
-    traj1_f4.setAttributes([1, 3000, 2, 2, 2])
+    traj1_f4.setAttributes([1, 3000, 2, 2, 2, "car"])
     traj1_f4.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-1, 2)))
 
     traj2_f1 = QgsFeature(layer.fields())
-    traj2_f1.setAttributes([2, 0, 1, 1, 1])
+    traj2_f1.setAttributes([2, 0, 1, 1, 1, "car"])
     traj2_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-0.5, 1)))
 
     traj2_f2 = QgsFeature(layer.fields())
-    traj2_f2.setAttributes([2, 1000, 2, 2, 2])
+    traj2_f2.setAttributes([2, 1000, 2, 2, 2, "car"])
     traj2_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.5, 2)))
 
     traj3_f1 = QgsFeature(layer.fields())
-    traj3_f1.setAttributes([3, 0, 1, 1, 1])
+    traj3_f1.setAttributes([3, 0, 1, 1, 1, "car"])
     traj3_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.5, 0.5)))
 
     traj3_f2 = QgsFeature(layer.fields())
-    traj3_f2.setAttributes([3, 1000, 2, 2, 2])
+    traj3_f2.setAttributes([3, 1000, 2, 2, 2, "car"])
     traj3_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.5, 1.5)))
 
     traj4_f1 = QgsFeature(layer.fields())
-    traj4_f1.setAttributes([4, 301000, 1, 1, 1])
+    traj4_f1.setAttributes([4, 301000, 1, 1, 1, "car"])
     traj4_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.5, 2)))
 
     traj4_f2 = QgsFeature(layer.fields())
-    traj4_f2.setAttributes([4, 302000, 2, 2, 2])
+    traj4_f2.setAttributes([4, 302000, 2, 2, 2, "car"])
     traj4_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(2.5, 1)))
 
     traj5_f1 = QgsFeature(layer.fields())
-    traj5_f1.setAttributes([5, 305000, 1, 1, 1])
+    traj5_f1.setAttributes([5, 305000, 1, 1, 1, "car"])
     traj5_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1, 0.5)))
 
     traj5_f2 = QgsFeature(layer.fields())
-    traj5_f2.setAttributes([5, 306000, 2, 2, 2])
+    traj5_f2.setAttributes([5, 306000, 2, 2, 2, "car"])
     traj5_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, -0.5)))
 
     traj6_f1 = QgsFeature(layer.fields())
-    traj6_f1.setAttributes([6, 309000, 1, 1, 1])
+    traj6_f1.setAttributes([6, 309000, 1, 1, 1, "car"])
     traj6_f1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.5, -0.5)))
 
     traj6_f2 = QgsFeature(layer.fields())
-    traj6_f2.setAttributes([6, 310000, 2, 2, 2])
+    traj6_f2.setAttributes([6, 310000, 2, 2, 2, "car"])
     traj6_f2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0, 0.5)))
 
     layer.addFeature(traj1_f1)
@@ -170,6 +172,7 @@ def test_count_trajectories(
     params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
         "INPUT_LINES": input_gate_layer_for_algorithm,
+        "TRAVELER_CLASS": "car",
         "START_TIME": None,
         "END_TIME": None,
         "OUTPUT_GATES": "TEMPORARY_OUTPUT",
@@ -302,6 +305,7 @@ def test_count_trajectories(
     case2_params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
         "INPUT_LINES": input_gate_layer_for_algorithm,
+        "TRAVELER_CLASS": "car",
         "START_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone.utc()),
         "END_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 5, 0), QTimeZone.utc()),
         "OUTPUT_GATES": "TEMPORARY_OUTPUT",

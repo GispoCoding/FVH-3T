@@ -9,6 +9,7 @@ def create_line_layer() -> QgsVectorLayer:
 
     layer.startEditing()
 
+    layer.addAttribute(QgsField("name", QVariant.String))
     layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
     layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
 

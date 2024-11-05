@@ -10,6 +10,7 @@ from qgis.core import (
     QgsProcessingFeedback,
     QgsProcessingParameterDateTime,
     QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterString,
     QgsProcessingParameterVectorLayer,
     QgsUnitTypes,
 )
@@ -22,6 +23,7 @@ from fvh3t.core.trajectory_layer import TrajectoryLayer
 class CountTrajectories(QgsProcessingAlgorithm):
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_LINES = "INPUT_LINES"
+    TRAVELER_CLASS = "TRAVELER_CLASS"
     START_TIME = "START_TIME"
     END_TIME = "END_TIME"
     OUTPUT_GATES = "OUTPUT_GATES"
@@ -59,6 +61,14 @@ class CountTrajectories(QgsProcessingAlgorithm):
                 name=self.INPUT_LINES,
                 description="Gates",
                 types=[QgsProcessing.TypeVectorLine],
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterString(
+                name=self.TRAVELER_CLASS,
+                description="Class of traveler",
+                optional=True,
             )
         )
 
@@ -109,6 +119,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
             feedback = QgsProcessingFeedback()
 
         point_layer = self.parameterAsVectorLayer(parameters, self.INPUT_POINTS, context)
+        traveler_class = self.parameterAsString(parameters, self.TRAVELER_CLASS, context)
         start_time: QDateTime = self.parameterAsDateTime(parameters, self.START_TIME, context)
         end_time: QDateTime = self.parameterAsDateTime(parameters, self.END_TIME, context)
 
@@ -151,6 +162,11 @@ class CountTrajectories(QgsProcessingAlgorithm):
         filter_expression: str | None = None
         if start_time_unix != min_timestamp or end_time_unix != max_timestamp:
             filter_expression = f'"timestamp" BETWEEN {start_time_unix} AND {end_time_unix}'
+        if not filter_expression:
+            if traveler_class:
+                filter_expression = f"\"label\" = '{traveler_class}'"
+        elif traveler_class:
+            filter_expression += f" AND \"label\" = '{traveler_class}'"
 
         trajectory_layer = TrajectoryLayer(
             point_layer,
@@ -186,14 +202,20 @@ class CountTrajectories(QgsProcessingAlgorithm):
 
         feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
 
-        gate_layer = GateLayer(line_layer, "counts_negative", "counts_positive")
+        gate_layer = GateLayer(line_layer, "name", "counts_negative", "counts_positive")
 
         gates = gate_layer.gates()
 
         for gate in gates:
             gate.count_trajectories_from_layer(trajectory_layer)
 
-        exported_gate_layer = gate_layer.as_line_layer()
+        if not start_time:
+            start_time = QDateTime.fromMSecsSinceEpoch(int(min_timestamp))
+        if not end_time:
+            end_time = QDateTime.fromMSecsSinceEpoch(int(max_timestamp))
+        exported_gate_layer = gate_layer.as_line_layer(
+            traveler_class=traveler_class, start_time=start_time, end_time=end_time
+        )
 
         if exported_gate_layer is None:
             msg = "Gate layer is None"

@@ -20,13 +20,22 @@ class Gate:
     must be a line.
     """
 
-    def __init__(self, geom: QgsGeometry, *, counts_negative: bool = False, counts_positive: bool = False) -> None:
+    def __init__(
+        self,
+        geom: QgsGeometry,
+        name: str,
+        *,
+        counts_negative: bool = False,
+        counts_positive: bool = False,
+    ) -> None:
         if geom.type() != QgsWkbTypes.GeometryType.LineGeometry:
             msg = "Gate must be created from a line geometry!"
             raise InvalidGeometryTypeException(msg)
 
         self.__geom: QgsGeometry = geom
         self.__trajectory_count: int = 0
+
+        self.__name: str = name
 
         self.__counts_negative: bool = counts_negative
         self.__counts_positive: bool = counts_positive
@@ -40,6 +49,9 @@ class Gate:
 
         self.__segments: tuple[GateSegment, ...] = ()
         self.create_segments()
+
+    def name(self) -> str:
+        return self.__name
 
     def set_counts_negative(self, *, state: bool) -> None:
         self.__counts_negative = state
