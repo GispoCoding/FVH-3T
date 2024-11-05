@@ -164,9 +164,9 @@ class CountTrajectories(QgsProcessingAlgorithm):
             filter_expression = f'"timestamp" BETWEEN {start_time_unix} AND {end_time_unix}'
         if not filter_expression:
             if traveler_class:
-                filter_expression = f'"label" = {traveler_class}'
+                filter_expression = f"\"label\" = '{traveler_class}'"
         elif traveler_class:
-            filter_expression += f' AND "label" = {traveler_class}'
+            filter_expression += f" AND \"label\" = '{traveler_class}'"
 
         trajectory_layer = TrajectoryLayer(
             point_layer,
