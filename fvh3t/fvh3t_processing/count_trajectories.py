@@ -209,6 +209,10 @@ class CountTrajectories(QgsProcessingAlgorithm):
         for gate in gates:
             gate.count_trajectories_from_layer(trajectory_layer)
 
+        if not start_time:
+            start_time = QDateTime.fromMSecsSinceEpoch(min_timestamp)
+        if not end_time:
+            end_time = QDateTime.fromMSecsSinceEpoch(max_timestamp)
         exported_gate_layer = gate_layer.as_line_layer(
             traveler_class=traveler_class, start_time=start_time, end_time=end_time
         )
