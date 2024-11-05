@@ -72,7 +72,7 @@
       <Option type="Map" name="properties">
        <Option type="Map" name="enabled">
         <Option type="bool" value="true" name="active"/>
-        <Option type="QString" value="counts_left" name="field"/>
+        <Option type="QString" value="counts_negative" name="field"/>
         <Option type="int" value="2" name="type"/>
        </Option>
       </Option>
@@ -153,7 +153,7 @@
       <Option type="Map" name="properties">
        <Option type="Map" name="enabled">
         <Option type="bool" value="true" name="active"/>
-        <Option type="QString" value="counts_right" name="field"/>
+        <Option type="QString" value="counts_positive" name="field"/>
         <Option type="int" value="2" name="type"/>
        </Option>
       </Option>
