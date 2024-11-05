@@ -9,6 +9,7 @@ from fvh3t.core.line_layer import create_line_layer
 def test_gate_layer_create_gates(qgis_gate_line_layer):
     gate_layer = GateLayer(
         qgis_gate_line_layer,
+        "name",
         "counts_negative",
         "counts_positive",
     )
@@ -43,6 +44,7 @@ def test_is_field_valid(qgis_gate_line_layer, qgis_gate_line_layer_wrong_field_t
     with pytest.raises(InvalidLayerException, match="Counts negative field either not found or of incorrect type."):
         GateLayer(
             qgis_gate_line_layer,
+            "name",
             "count_positive",  # use wrong field names on purpose
             "count_negative",
         )
@@ -50,6 +52,7 @@ def test_is_field_valid(qgis_gate_line_layer, qgis_gate_line_layer_wrong_field_t
     with pytest.raises(InvalidLayerException, match="Counts positive field either not found or of incorrect type."):
         GateLayer(
             qgis_gate_line_layer_wrong_field_type,
+            "name",
             "counts_negative",
             "counts_positive",
         )
@@ -61,7 +64,7 @@ def test_create_valid_gate_from_empty_line_layer():
     layer.startEditing()
 
     gate = QgsFeature(layer.fields())
-    gate.setAttributes([True, True])
+    gate.setAttributes(["name", True, True])
     gate.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -77,6 +80,7 @@ def test_create_valid_gate_from_empty_line_layer():
 
     gate_layer = GateLayer(
         layer,
+        "name",
         "counts_negative",
         "counts_positive",
     )

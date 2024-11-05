@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from qgis.core import QgsFeature, QgsFeatureSource, QgsField, QgsVectorLayer, QgsWkbTypes
-from qgis.PyQt.QtCore import QMetaType, QVariant
+from qgis.PyQt.QtCore import QDateTime, QMetaType, QVariant
 
 from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException
 from fvh3t.core.gate import Gate
@@ -20,10 +20,12 @@ class GateLayer:
     def __init__(
         self,
         layer: QgsVectorLayer,
+        name_field: str,
         counts_negative_field: str,
         counts_positive_field: str,
     ) -> None:
         self.__layer: QgsVectorLayer = layer
+        self.__name_field = name_field
         self.__counts_negative_field = counts_negative_field
         self.__counts_positive_field = counts_positive_field
 
@@ -32,16 +34,23 @@ class GateLayer:
             self.create_gates()
 
     def create_gates(self) -> None:
+        name_field_idx: int = self.__layer.fields().indexOf(self.__name_field)
         counts_negative_field_idx: int = self.__layer.fields().indexOf(self.__counts_negative_field)
         counts_positive_field_idx: int = self.__layer.fields().indexOf(self.__counts_positive_field)
 
         gates: list[Gate] = []
 
         for feature in self.__layer.getFeatures():
+            name: str = feature[name_field_idx]
             counts_negative: bool = feature[counts_negative_field_idx]
             counts_positive: bool = feature[counts_positive_field_idx]
 
-            gate = Gate(feature.geometry(), counts_negative=counts_negative, counts_positive=counts_positive)
+            gate = Gate(
+                feature.geometry(),
+                name=name,
+                counts_negative=counts_negative,
+                counts_positive=counts_positive,
+            )
 
             gates.append(gate)
 
@@ -50,12 +59,16 @@ class GateLayer:
     def gates(self) -> tuple[Gate, ...]:
         return self.__gates
 
-    def as_line_layer(self) -> QgsVectorLayer | None:
+    def as_line_layer(self, traveler_class: str, start_time: QDateTime, end_time: QDateTime) -> QgsVectorLayer | None:
         line_layer = QgsVectorLayer("LineString?crs=3067", "Line Layer", "memory")
 
         line_layer.startEditing()
 
         line_layer.addAttribute(QgsField("fid", QVariant.Int))
+        line_layer.addAttribute(QgsField("name", QVariant.String))
+        line_layer.addAttribute(QgsField("traveler_class", QVariant.String))
+        line_layer.addAttribute(QgsField("start_time", QVariant.Time))
+        line_layer.addAttribute(QgsField("end_time", QVariant.Time))
         line_layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
         line_layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
         line_layer.addAttribute(QgsField("trajectory_count", QVariant.Int))
@@ -68,6 +81,10 @@ class GateLayer:
             feature.setAttributes(
                 [
                     i,
+                    gate.name(),
+                    traveler_class,
+                    start_time,
+                    end_time,
                     gate.counts_negative(),
                     gate.counts_positive(),
                     gate.trajectory_count(),
@@ -117,6 +134,10 @@ class GateLayer:
         has_features: bool = self.__layer.hasFeatures() == QgsFeatureSource.FeatureAvailability.FeaturesAvailable
         if not has_features:
             msg = "Layer has no features."
+            raise InvalidLayerException(msg)
+
+        if not self.is_field_valid(self.__name_field, accepted_types=[QMetaType.Type.QString]):
+            msg = "Name field either not found or of incorrect type."
             raise InvalidLayerException(msg)
 
         if not self.is_field_valid(self.__counts_negative_field, accepted_types=[QMetaType.Type.Bool]):

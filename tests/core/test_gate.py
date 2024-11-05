@@ -17,16 +17,16 @@ def test_trajectory_count(qgis_point_layer_for_gate_count):
     )
 
     geom1 = QgsGeometry.fromPolylineXY([QgsPointXY(-0.5, 0.5), QgsPointXY(0.5, 0.5)])
-    gate1 = Gate(geom1, counts_positive=True)
+    gate1 = Gate(geom1, name="gate1", counts_positive=True)
 
     geom2 = QgsGeometry.fromPolylineXY([QgsPointXY(-1, 0.75), QgsPointXY(1, 1)])
-    gate2 = Gate(geom2, counts_negative=True)
+    gate2 = Gate(geom2, name="gate2", counts_negative=True)
 
     geom3 = QgsGeometry.fromPolylineXY([QgsPointXY(0.5, 0), QgsPointXY(-0.75, 2)])
-    gate3 = Gate(geom3, counts_negative=True, counts_positive=True)
+    gate3 = Gate(geom3, name="gate3", counts_negative=True, counts_positive=True)
 
     geom4 = QgsGeometry.fromPolylineXY([QgsPointXY(-1, -0.5), QgsPointXY(1, -0.5)])
-    gate4 = Gate(geom4, counts_negative=True, counts_positive=True)
+    gate4 = Gate(geom4, name="gate4", counts_negative=True, counts_positive=True)
 
     gate1.count_trajectories_from_layer(traj_layer)
     assert gate1.trajectory_count() == 1

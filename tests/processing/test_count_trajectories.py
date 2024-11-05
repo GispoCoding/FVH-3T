@@ -16,11 +16,12 @@ def input_gate_layer_for_algorithm():
 
     layer.startEditing()
 
+    layer.addAttribute(QgsField("name", QVariant.String))
     layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
     layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
 
     gate1 = QgsFeature(layer.fields())
-    gate1.setAttributes([True, False])
+    gate1.setAttributes(["gate1", True, False])
     gate1.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -31,7 +32,7 @@ def input_gate_layer_for_algorithm():
     )
 
     gate2 = QgsFeature(layer.fields())
-    gate2.setAttributes([False, True])
+    gate2.setAttributes(["gate2", False, True])
     gate2.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -42,7 +43,7 @@ def input_gate_layer_for_algorithm():
     )
 
     gate3 = QgsFeature(layer.fields())
-    gate3.setAttributes([True, True])
+    gate3.setAttributes(["gate3", True, True])
     gate3.setGeometry(
         QgsGeometry.fromPolylineXY(
             [
@@ -170,6 +171,7 @@ def test_count_trajectories(
     params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
         "INPUT_LINES": input_gate_layer_for_algorithm,
+        "TRAVELER_CLASS": "CAR",
         "START_TIME": None,
         "END_TIME": None,
         "OUTPUT_GATES": "TEMPORARY_OUTPUT",
@@ -302,6 +304,7 @@ def test_count_trajectories(
     case2_params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
         "INPUT_LINES": input_gate_layer_for_algorithm,
+        "TRAVELER_CLASS": "CAR",
         "START_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone.utc()),
         "END_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 5, 0), QTimeZone.utc()),
         "OUTPUT_GATES": "TEMPORARY_OUTPUT",
