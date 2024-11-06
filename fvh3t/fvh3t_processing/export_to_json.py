@@ -82,7 +82,9 @@ class ExportToJSON(QgsProcessingAlgorithm):
                     if field_name == "name":
                         field_name = "channel"  # noqa: PLW2901
 
-                    value = field_value
+                    # Convert speed km/h -> m/s
+                    value = field_value / 3.6 if field_name == "speed_avg" else field_value
+
                     # Convert QVariant nulls to None
                     if isinstance(field_value, QVariant):
                         value = None if value.isNull() else value.value()
