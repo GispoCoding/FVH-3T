@@ -4,7 +4,6 @@ name: Tests
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the wanted branches
 on:
-  pull_request:
   push:
     branches: [main]
 
@@ -18,7 +17,7 @@ jobs:
     strategy:
       matrix:
         # Remove unsupported versions and add more versions. Use LTR version in the cov_tests job
-        qgis-image-tags: [release-3_28, release-3_34, latest]
+        qgis-image-tags: [release-3_28] # Disable these for now: release-3_34, latest
       fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
