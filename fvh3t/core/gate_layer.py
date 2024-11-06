@@ -66,14 +66,14 @@ class GateLayer:
 
         line_layer.addAttribute(QgsField("fid", QVariant.Int))
         line_layer.addAttribute(QgsField("name", QVariant.String))
-        line_layer.addAttribute(QgsField("traveler_class", QVariant.String))
-        line_layer.addAttribute(QgsField("start_time", QVariant.Time))
-        line_layer.addAttribute(QgsField("end_time", QVariant.Time))
+        line_layer.addAttribute(QgsField("class", QVariant.String))
+        line_layer.addAttribute(QgsField("interval_start", QVariant.Time))
+        line_layer.addAttribute(QgsField("interval_end", QVariant.Time))
         line_layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
         line_layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
-        line_layer.addAttribute(QgsField("trajectory_count", QVariant.Int))
-        line_layer.addAttribute(QgsField("average_speed (km/h)", QVariant.Double))
-        line_layer.addAttribute(QgsField("average_acceleration (m/s²)", QVariant.Double))
+        line_layer.addAttribute(QgsField("vehicle_count", QVariant.Int))
+        line_layer.addAttribute(QgsField("speed_avg", QVariant.Double))
+        line_layer.addAttribute(QgsField("acceleration_avg", QVariant.Double))
 
         fields = line_layer.fields()
 
