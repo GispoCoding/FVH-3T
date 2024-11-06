@@ -72,6 +72,8 @@ class GateLayer:
         line_layer.addAttribute(QgsField("counts_negative", QVariant.Bool))
         line_layer.addAttribute(QgsField("counts_positive", QVariant.Bool))
         line_layer.addAttribute(QgsField("trajectory_count", QVariant.Int))
+        line_layer.addAttribute(QgsField("average_speed (km/h)", QVariant.Double))
+        line_layer.addAttribute(QgsField("average_acceleration (m/s²)", QVariant.Double))
 
         fields = line_layer.fields()
 
@@ -88,6 +90,8 @@ class GateLayer:
                     gate.counts_negative(),
                     gate.counts_positive(),
                     gate.trajectory_count(),
+                    gate.average_speed(),
+                    gate.average_acceleration(),
                 ]
             )
             feature.setGeometry(gate.geometry())
