@@ -6,3 +6,4 @@ start_ide.bat
 */.pytest_cache
 __pycache__
 fvh3t.egg-info
+symbology-style.db
