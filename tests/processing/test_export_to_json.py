@@ -62,5 +62,5 @@ def test_export_to_json(
     data = json_data[0]
     assert len(data) == 7  # Number of fields per gate
 
-    keys = {"name", "class", "interval_start", "interval_end", "vehicle_count", "speed_avg", "acceleration_avg"}
+    keys = {"channel", "class", "interval_start", "interval_end", "vehicle_count", "speed_avg", "acceleration_avg"}
     assert set(data.keys()) == keys

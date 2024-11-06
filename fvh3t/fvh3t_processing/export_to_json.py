@@ -11,7 +11,7 @@ from qgis.core import (
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterVectorLayer,
 )
-from qgis.PyQt.QtCore import QCoreApplication, QTime, QVariant
+from qgis.PyQt.QtCore import QCoreApplication, QDateTime, QVariant
 
 
 class ExportToJSON(QgsProcessingAlgorithm):
@@ -49,7 +49,7 @@ class ExportToJSON(QgsProcessingAlgorithm):
             QgsProcessingParameterFileDestination(
                 name=self.OUTPUT_JSON,
                 description="Output JSON file",
-                fileFilter="JSON files (* .json)",
+                fileFilter="JSON files (*.json)",
             )
         )
 
@@ -79,14 +79,17 @@ class ExportToJSON(QgsProcessingAlgorithm):
 
             for field_name, field_value in zip(gate_layer.fields().names(), feature.attributes()):
                 if field_name not in fields_to_exclude:
+                    if field_name == "name":
+                        field_name = "channel"  # noqa: PLW2901
+
                     value = field_value
                     # Convert QVariant nulls to None
                     if isinstance(field_value, QVariant):
                         value = None if value.isNull() else value.value()
 
                     # Convert QTime objects to string
-                    if isinstance(field_value, QTime):
-                        value = value.toString("HH:mm:ss")
+                    if isinstance(field_value, QDateTime):
+                        value = value.toString("yyyy-MM-dd HH-mm-ss")
 
                     feature_dict[field_name] = value
 
