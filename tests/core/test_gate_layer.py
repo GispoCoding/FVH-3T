@@ -1,9 +1,9 @@
 import pytest
-from qgis.core import QgsFeature, QgsGeometry, QgsPointXY
+from qgis.core import QgsCoordinateReferenceSystem, QgsFeature, QgsGeometry, QgsPointXY
 
 from fvh3t.core.exceptions import InvalidLayerException
 from fvh3t.core.gate_layer import GateLayer
-from fvh3t.core.line_layer import create_line_layer
+from fvh3t.core.qgis_layer_utils import QgisLayerUtils
 
 
 def test_gate_layer_create_gates(qgis_gate_line_layer):
@@ -59,7 +59,7 @@ def test_is_field_valid(qgis_gate_line_layer, qgis_gate_line_layer_wrong_field_t
 
 
 def test_create_valid_gate_from_empty_line_layer():
-    layer = create_line_layer()
+    layer = QgisLayerUtils.create_gate_layer(QgsCoordinateReferenceSystem("EPSG:3067"))
 
     layer.startEditing()
 

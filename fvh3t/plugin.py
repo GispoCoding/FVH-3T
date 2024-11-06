@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import Callable
 
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QCoreApplication, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QWidget
 from qgis.utils import iface
 
+from fvh3t.core.qgis_layer_utils import QgisLayerUtils
 from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import TTTProvider
 from fvh3t.qgis_plugin_tools.tools.custom_logging import setup_logger, teardown_logger
-from fvh3t.qgis_plugin_tools.tools.i18n import setup_translation
-from fvh3t.qgis_plugin_tools.tools.resources import plugin_name
+from fvh3t.qgis_plugin_tools.tools.i18n import setup_translation, tr
+from fvh3t.qgis_plugin_tools.tools.resources import plugin_name, resources_path
 
 
 class Plugin:
@@ -109,11 +110,11 @@ class Plugin:
     def initGui(self) -> None:  # noqa N802
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.add_action(
-            "",
-            text=Plugin.name,
-            callback=self.run,
+            resources_path("icons", "add_gate.png"),
+            text=tr("Create gate layer"),
+            callback=self.create_gate_layer,
             parent=iface.mainWindow(),
-            add_to_toolbar=False,
+            add_to_toolbar=True,
         )
         self.initProcessing()
 
@@ -128,6 +129,7 @@ class Plugin:
         teardown_logger(Plugin.name)
         QgsApplication.processingRegistry().removeProvider(self.provider)
 
-    def run(self) -> None:
-        """Run method that performs all the real work"""
-        print("Hello QGIS plugin")  # noqa: T201
+    def create_gate_layer(self) -> None:
+        layer: QgsVectorLayer = QgisLayerUtils.create_gate_layer(QgsProject.instance().crs())
+
+        QgsProject.instance().addMapLayer(layer)

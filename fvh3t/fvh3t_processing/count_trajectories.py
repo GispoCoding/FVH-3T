@@ -12,11 +12,13 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterString,
     QgsProcessingParameterVectorLayer,
+    QgsProcessingUtils,
     QgsUnitTypes,
 )
 from qgis.PyQt.QtCore import QCoreApplication, QDateTime
 
 from fvh3t.core.gate_layer import GateLayer
+from fvh3t.core.qgis_layer_utils import QgisLayerUtils
 from fvh3t.core.trajectory_layer import TrajectoryLayer
 
 
@@ -28,6 +30,8 @@ class CountTrajectories(QgsProcessingAlgorithm):
     END_TIME = "END_TIME"
     OUTPUT_GATES = "OUTPUT_GATES"
     OUTPUT_TRAJECTORIES = "OUTPUT_TRAJECTORIES"
+
+    gate_dest_id: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -221,7 +225,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
             msg = "Gate layer is None"
             raise ValueError(msg)
 
-        (sink, gate_dest_id) = self.parameterAsSink(
+        (sink, self.gate_dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT_GATES,
             context,
@@ -233,4 +237,11 @@ class CountTrajectories(QgsProcessingAlgorithm):
         for feature in exported_gate_layer.getFeatures():
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
-        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_GATES: gate_dest_id}
+        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_GATES: self.gate_dest_id}
+
+    def postProcessAlgorithm(self, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> dict[str, Any]:  # noqa: N802
+        if self.gate_dest_id:
+            layer = QgsProcessingUtils.mapLayerFromString(self.gate_dest_id, context)
+            QgisLayerUtils.set_gate_style(layer)
+
+        return super().postProcessAlgorithm(context, feedback)
