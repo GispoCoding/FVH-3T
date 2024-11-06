@@ -198,9 +198,9 @@ def test_count_trajectories(
     assert gate2.geometry().asWkt() == "LineString (0 1, 0 2)"
     assert gate3.geometry().asWkt() == "LineString (1 1, 2 1, 2 2)"
 
-    assert gate1.attribute("trajectory_count") == 1
-    assert gate2.attribute("trajectory_count") == 1
-    assert gate3.attribute("trajectory_count") == 2
+    assert gate1.attribute("vehicle_count") == 1
+    assert gate2.attribute("vehicle_count") == 1
+    assert gate3.attribute("vehicle_count") == 2
 
     traj1: QgsFeature = output_trajectories.getFeature(1)
     traj2: QgsFeature = output_trajectories.getFeature(2)
@@ -331,9 +331,9 @@ def test_count_trajectories(
     assert case2gate2.geometry().asWkt() == "LineString (0 1, 0 2)"
     assert case2gate3.geometry().asWkt() == "LineString (1 1, 2 1, 2 2)"
 
-    assert case2gate1.attribute("trajectory_count") == 0
-    assert case2gate2.attribute("trajectory_count") == 1
-    assert case2gate3.attribute("trajectory_count") == 1
+    assert case2gate1.attribute("vehicle_count") == 0
+    assert case2gate2.attribute("vehicle_count") == 1
+    assert case2gate3.attribute("vehicle_count") == 1
 
     case2traj1: QgsFeature = case2_output_trajectories.getFeature(1)
     case2traj2: QgsFeature = case2_output_trajectories.getFeature(2)
