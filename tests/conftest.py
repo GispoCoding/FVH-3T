@@ -18,6 +18,7 @@ import pytest
 from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QVariant
 
+from fvh3t.core.area import Area
 from fvh3t.core.gate import Gate
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode, TrajectorySegment
 
@@ -407,3 +408,18 @@ def qgis_gate_line_layer_wrong_field_type():
     layer.commitChanges()
 
     return layer
+
+
+@pytest.fixture
+def four_point_area():
+    return Area(
+        QgsGeometry.fromPolygonXY(
+            [
+                QgsPointXY(-0.5, -0.5),
+                QgsPointXY(0.5, -0.5),
+                QgsPointXY(0.5, 0.5),
+                QgsPointXY(-0.5, 0.5),
+            ]
+        ),
+        "polygon",
+    )
