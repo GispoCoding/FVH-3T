@@ -1,6 +1,6 @@
 [general]
 name=Traffic Trajectory Toolkit
-description=
+description=Plugin for analyzing traffic trajectory data
 about=
 version=0.1.0
 qgisMinimumVersion=3.16

@@ -3,6 +3,7 @@ name: code-style
 on:
   push:
     branches: [main]
+    paths: ['fvh3t']
 
 jobs:
   code-style:
