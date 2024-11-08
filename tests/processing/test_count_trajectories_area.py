@@ -11,52 +11,6 @@ from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import TTTProvid
 
 
 @pytest.fixture
-def input_area_layer_for_algorithm():
-    layer = QgsVectorLayer("Polygon?crs=EPSG:3857", "Polygon Layer", "memory")
-
-    layer.startEditing()
-
-    layer.addAttribute(QgsField("name", QVariant.String))
-
-    area1 = QgsFeature(layer.fields())
-    area1.setAttributes(["area1"])
-    area1.setGeometry(
-        QgsGeometry.fromPolygonXY(
-            [
-                [
-                    QgsPointXY(1, 2),
-                    QgsPointXY(2, 2),
-                    QgsPointXY(2, 2.5),
-                    QgsPointXY(1, 2.5),
-                ],
-            ]
-        )
-    )
-
-    area2 = QgsFeature(layer.fields())
-    area2.setAttributes(["area2"])
-    area2.setGeometry(
-        QgsGeometry.fromPolygonXY(
-            [
-                [
-                    QgsPointXY(0, 0),
-                    QgsPointXY(1, 0),
-                    QgsPointXY(1, 1),
-                    QgsPointXY(0, 1),
-                ],
-            ]
-        )
-    )
-
-    layer.addFeature(area1)
-    layer.addFeature(area2)
-
-    layer.commitChanges()
-
-    return layer
-
-
-@pytest.fixture
 def input_point_layer_for_algorithm():
     layer = QgsVectorLayer("Point?crs=EPSG:3857", "Point Layer", "memory")
 
@@ -156,7 +110,7 @@ def input_point_layer_for_algorithm():
 def test_count_trajectories_area(
     qgis_app,
     qgis_processing,  # noqa: ARG001
-    input_area_layer_for_algorithm: QgsVectorLayer,
+    qgis_area_polygon_layer: QgsVectorLayer,
     input_point_layer_for_algorithm: QgsVectorLayer,
 ):
     provider = TTTProvider()
@@ -166,11 +120,11 @@ def test_count_trajectories_area(
     ## TEST CASE 1 - NO FILTERING
 
     # script requires layers to be added to the project
-    QgsProject.instance().addMapLayers([input_area_layer_for_algorithm, input_point_layer_for_algorithm])
+    QgsProject.instance().addMapLayers([qgis_area_polygon_layer, input_point_layer_for_algorithm])
 
     params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
-        "INPUT_AREAS": input_area_layer_for_algorithm,
+        "INPUT_AREAS": qgis_area_polygon_layer,
         "TRAVELER_CLASS": None,
         "START_TIME": None,
         "END_TIME": None,
@@ -205,7 +159,7 @@ def test_count_trajectories_area(
 
     case2_params = {
         "INPUT_POINTS": input_point_layer_for_algorithm,
-        "INPUT_AREAS": input_area_layer_for_algorithm,
+        "INPUT_AREAS": qgis_area_polygon_layer,
         "TRAVELER_CLASS": "car",  # filter by class too
         "START_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone.utc()),
         "END_TIME": QDateTime(QDate(1970, 1, 1), QTime(0, 5, 0), QTimeZone.utc()),

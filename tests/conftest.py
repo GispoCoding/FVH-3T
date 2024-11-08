@@ -425,3 +425,49 @@ def four_point_area():
         ),
         "polygon",
     )
+
+
+@pytest.fixture
+def qgis_area_polygon_layer():
+    layer = QgsVectorLayer("Polygon?crs=EPSG:3857", "Polygon Layer", "memory")
+
+    layer.startEditing()
+
+    layer.addAttribute(QgsField("name", QVariant.String))
+
+    area1 = QgsFeature(layer.fields())
+    area1.setAttributes(["area1"])
+    area1.setGeometry(
+        QgsGeometry.fromPolygonXY(
+            [
+                [
+                    QgsPointXY(1, 2),
+                    QgsPointXY(2, 2),
+                    QgsPointXY(2, 2.5),
+                    QgsPointXY(1, 2.5),
+                ],
+            ]
+        )
+    )
+
+    area2 = QgsFeature(layer.fields())
+    area2.setAttributes(["area2"])
+    area2.setGeometry(
+        QgsGeometry.fromPolygonXY(
+            [
+                [
+                    QgsPointXY(0, 0),
+                    QgsPointXY(1, 0),
+                    QgsPointXY(1, 1),
+                    QgsPointXY(0, 1),
+                ],
+            ]
+        )
+    )
+
+    layer.addFeature(area1)
+    layer.addFeature(area2)
+
+    layer.commitChanges()
+
+    return layer
