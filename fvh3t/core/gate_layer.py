@@ -59,7 +59,9 @@ class GateLayer:
     def gates(self) -> tuple[Gate, ...]:
         return self.__gates
 
-    def as_line_layer(self, traveler_class: str, start_time: QDateTime, end_time: QDateTime) -> QgsVectorLayer | None:
+    def as_line_layer(
+        self, traveler_class: str | None, start_time: QDateTime, end_time: QDateTime
+    ) -> QgsVectorLayer | None:
         line_layer = QgsVectorLayer("LineString", "Line Layer", "memory")
         line_layer.setCrs(self.__layer.crs())
 

@@ -1,6 +1,7 @@
 from qgis.core import QgsProcessingProvider
 
-from fvh3t.fvh3t_processing.count_trajectories import CountTrajectories
+from fvh3t.fvh3t_processing.count_trajectories_area import CountTrajectoriesArea
+from fvh3t.fvh3t_processing.count_trajectories_gate import CountTrajectoriesGate
 from fvh3t.fvh3t_processing.export_to_json import ExportToJSON
 
 
@@ -41,5 +42,6 @@ class TTTProvider(QgsProcessingProvider):
         """
         Adds individual processing algorithms to the provider.
         """
-        self.addAlgorithm(CountTrajectories())
+        self.addAlgorithm(CountTrajectoriesGate())
+        self.addAlgorithm(CountTrajectoriesArea())
         self.addAlgorithm(ExportToJSON())

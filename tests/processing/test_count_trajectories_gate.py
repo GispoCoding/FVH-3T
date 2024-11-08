@@ -180,7 +180,7 @@ def test_count_trajectories(
     }
 
     result = processing.run(
-        "traffic_trajectory_toolkit:count_trajectories",
+        "traffic_trajectory_toolkit:count_trajectories_gate",
         params,
     )
 
@@ -313,7 +313,7 @@ def test_count_trajectories(
     }
 
     case2_result = processing.run(
-        "traffic_trajectory_toolkit:count_trajectories",
+        "traffic_trajectory_toolkit:count_trajectories_gate",
         case2_params,
     )
 
