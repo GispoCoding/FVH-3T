@@ -39,7 +39,8 @@ can be created.
 
 ## Getting started
 
-You must have QGIS installed (version 3.34 or newer).
+You must have installed QGIS, version 3.34 or newer (earlier versions
+might work but are not officially supported.
 To install the plugin you can download the latest release through
 [this](https://github.com/GispoCoding/FVH-3T/releases/latest)
 link. Click to download the **fvh3t._\<version number\>_.zip** file.
@@ -82,6 +83,7 @@ Three algorithms are included.
 #### Count trajectories (gates)
 * Two inputs:
   1. Point layer from which trajectories can be created
+  2. Area layer
 * Creates trajectories from the points
 * Calculates whether they pass the given gates
 * Two outputs:
