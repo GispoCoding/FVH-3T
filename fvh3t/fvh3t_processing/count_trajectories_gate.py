@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from qgis.core import (
+    QgsFeatureRequest,
     QgsFeatureSink,
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -143,7 +144,7 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
             start_time, end_time, min_timestamp, max_timestamp
         )
 
-        filter_expression: str | None = ProcessingUtils.get_filter_expression(
+        filter_expression: str | None = ProcessingUtils.get_filter_expression_time_and_class(
             start_time_unix,
             end_time_unix,
             traveler_class,
@@ -151,15 +152,20 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
             max_timestamp,
         )
 
+        req = QgsFeatureRequest()
+        if filter_expression:
+            req.setFilterExpression(filter_expression)
+
+        filtered_layer = point_layer.materialize(req)
+
         trajectory_layer = TrajectoryLayer(
-            point_layer,
+            filtered_layer,
             "id",
             "timestamp",
             "size_x",
             "size_y",
             "size_z",
             QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
-            filter_expression,
         )
 
         exported_traj_layer = trajectory_layer.as_line_layer()

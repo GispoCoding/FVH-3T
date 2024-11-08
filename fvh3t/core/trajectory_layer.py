@@ -134,7 +134,7 @@ class TrajectoryLayer:
     def crs(self) -> QgsCoordinateReferenceSystem:
         return self.__layer.crs()
 
-    def create_trajectories(self, filter_expression: str | None) -> None:
+    def create_trajectories(self, extra_filter_expression: str | None) -> None:
         id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
         timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
         width_field_idx: int = self.__layer.fields().indexOf(self.__width_field)
@@ -147,8 +147,8 @@ class TrajectoryLayer:
 
         for identifier in unique_ids:
             expression_str = f'("{self.__id_field}" = {identifier})'
-            if filter_expression:
-                expression_str += f" and ({filter_expression})"
+            if extra_filter_expression:
+                expression_str += f" and ({extra_filter_expression})"
 
             expression = QgsExpression(expression_str)
             request = QgsFeatureRequest(expression)

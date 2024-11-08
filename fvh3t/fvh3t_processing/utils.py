@@ -55,7 +55,7 @@ class ProcessingUtils:
             date_time.setTime(zero_s_time)
 
     @staticmethod
-    def get_filter_expression(
+    def get_filter_expression_time_and_class(
         start_timestamp: int,
         end_timestamp: int,
         traveler_class: str | None,
