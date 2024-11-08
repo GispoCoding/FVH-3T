@@ -42,22 +42,56 @@ can be created.
 You must have QGIS installed (version 3.34 or newer).
 To install the plugin you can download the latest release through
 [this](https://github.com/GispoCoding/FVH-3T/releases/latest)
-link. Click to download the "fvh3t.\<version number\>.zip".
+link. Click to download the **fvh3t._\<version number\>_.zip** file.
 
-You can install the plugin directly from the .zip file. Open QGIS
+You can install the plugin directly from the .zip file:
+* Open QGIS
 and from the top menu click **Plugins** >
-**Manage and Install Plugins...**. In the dialog click on the
-**Install from ZIP** tab on the panel on the left. Select the .zip
-file you downloaded previously and click **Install Plugin**. You can find the features of the plugin from the plugins
-**toolbar**, the **Plugins** menu and most importantly the
-**Processing toolbox** (found in **Processing** > **Toolbox**).
+**Manage and Install Plugins...**
+* In the dialog click on the
+**Install from ZIP** tab on the panel on the left
+* Select the .zip
+file you downloaded previously and click **Install Plugin**.
 
-You can create either a virtual **gate** or **area layer**
-using the toolbar buttons, to which you can create virtual gates or
-areas using the QGIS digitizing tools. These layers can then in
-turn be used in the processing algorithms alongside with
-the Lidar point data to calculate information about the
+You can find the features of the plugin in:
+*  the plugins **toolbar**
+* the **Plugins** menu
+* most importantly the
+**Processing toolbox** (found in **Processing** > **Toolbox** > **Traffic trajectory toolkit**).
+
+You can create a virtual **gate** or  an **area layer**
+using the toolbar buttons, to which you digitize new features.
+These layers can then in turn be used in the processing algorithms
+with the Lidar point data to calculate information about the
 trajectories passing through the gates or areas.
+
+### Algorithms
+
+Three algorithms are included.
+
+#### Count trajectories (areas)
+* Two inputs:
+  1. Point layer from which trajectories can be created
+  2. Gate layer
+* Creates trajectories from the points
+* Calculates their speed inside of the given areas
+* Two outputs:
+  1. Line layer for the trajectories
+  2. Polygon layer for the areas with additional calculated data
+
+#### Count trajectories (gates)
+* Two inputs:
+  1. Point layer from which trajectories can be created
+* Creates trajectories from the points
+* Calculates whether they pass the given gates
+* Two outputs:
+  1. Line layer for the trajectories
+  2. Line layer for the gates with additional calculated data
+
+#### Export to JSON
+* Exports the data of "Count trajectories (gates)" output 2 to a JSON file
+* Output adheres to [this](https://bitbucket.org/conveqs/conveqs_platform_interface/src/master/json_schemas/history-detectors.json)
+JSON schema
 
 ## Development
 
