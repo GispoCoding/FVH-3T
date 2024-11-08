@@ -1,11 +1,63 @@
-# FVH-3T
-![tests](https://github.com/GispoCoding/fvh3t/workflows/Tests/badge.svg)
-[![codecov.io](https://codecov.io/github/GispoCoding/fvh3t/coverage.svg?branch=main)](https://codecov.io/github/GispoCoding/fvh3t?branch=main)
-![release](https://github.com/GispoCoding/fvh3t/workflows/Release/badge.svg)
+<h1 align="center">Traffic Trajectory Toolkit</h2>
+<p align="center">QGIS plugin for traffic trajectory analysis</p>
 
-[![GPLv2 license](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+<!-- badges -->
+<p align="center">
+  <a href="https://github.com/GispoCoding/FVH-3T/actions/workflows/tests.yml">
+    <img src="https://github.com/GispoCoding/fvh-3t/workflows/Tests/badge.svg"
+  /></a>
+  <a href="https://github.com/GispoCoding/FVH-3T/actions/workflows/code-style.yml">
+    <img src="https://github.com/GispoCoding/fvh-3t/workflows/code-style/badge.svg"
+  /></a>
+  <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
+    <img src="https://img.shields.io/badge/License-GPLv2-blue.svg"
+  /></a>
+</p>
+
+<!-- links to sections / TOC -->
+<p align="center">
+  <a href="#introduction">Introduction</a>
+  ·
+  <a href="#getting-started">Getting started</a>
+  ·
+  <a href="#development">Development</a>
+  ·
+  <a href="#license">License</a>
+</p>
+
+## Introduction
+
+FVH-3T (Forum Virium Helsinki - **T**raffic
+**T**rajectory **T**oolkit) is a QGIS plugin which
+allows users to analyze trajectory-based traffic data.
+It is intended to be used with point data sets captured
+by Lidar and processed to a format from which trajectories
+can be created.
+
+> [!IMPORTANT]
+> FVH-3T is still in development!
+
+## Getting started
+
+You must have QGIS installed (version 3.34 or newer).
+To install the plugin you can download the latest release through
+[this](https://github.com/GispoCoding/FVH-3T/releases/latest)
+link. Click to download the "fvh3t.\<version number\>.zip".
+
+You can install the plugin directly from the .zip file. Open QGIS
+and from the top menu click **Plugins** >
+**Manage and Install Plugins...**. In the dialog click on the
+**Install from ZIP** tab on the panel on the left. Select the .zip
+file you downloaded previously and click **Install Plugin**. You can find the features of the plugin from the plugins
+**toolbar**, the **Plugins** menu and most importantly the
+**Processing toolbox** (found in **Processing** > **Toolbox**).
+
+You can create either a virtual **gate** or **area layer**
+using the toolbar buttons, to which you can create virtual gates or
+areas using the QGIS digitizing tools. These layers can then in
+turn be used in the processing algorithms alongside with
+the Lidar point data to calculate information about the
+trajectories passing through the gates or areas.
 
 ## Development
 
