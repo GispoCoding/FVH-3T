@@ -15,6 +15,16 @@ from fvh3t.qgis_plugin_tools.tools.resources import resources_path
 
 class QgisLayerUtils:
     @staticmethod
+    def set_area_style(layer: QgsVectorLayer) -> None:
+        doc = QDomDocument()
+
+        with open(resources_path("style", "area_style.xml")) as style_file:
+            doc.setContent(style_file.read())
+
+        renderer = QgsFeatureRenderer.load(doc.documentElement(), QgsReadWriteContext())
+        layer.setRenderer(renderer)
+
+    @staticmethod
     def set_gate_style(layer: QgsVectorLayer) -> None:
         doc = QDomDocument()
 
@@ -41,5 +51,17 @@ class QgisLayerUtils:
         layer.setConstraintExpression(2, '"counts_negative" OR "counts_positive"')
 
         QgisLayerUtils.set_gate_style(layer)
+
+        return layer
+
+    @staticmethod
+    def create_area_layer(crs: QgsCoordinateReferenceSystem) -> QgsVectorLayer:
+        layer = QgsVectorLayer("Polygon", "Area Layer", "memory")
+        layer.setCrs(crs)
+
+        with edit(layer):
+            layer.addAttribute(QgsField("name", QVariant.String))
+
+        QgisLayerUtils.set_area_style(layer)
 
         return layer
