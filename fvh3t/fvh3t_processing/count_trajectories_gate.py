@@ -129,6 +129,11 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
         start_time: QDateTime = self.parameterAsDateTime(parameters, self.START_TIME, context)
         end_time: QDateTime = self.parameterAsDateTime(parameters, self.END_TIME, context)
 
+        # create gate layer already, so we check that it's valid
+        line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
+        feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
+        gate_layer = GateLayer(line_layer, "name", "counts_negative", "counts_positive")
+
         # the datetime widget doesn't allow the user to set the seconds and they
         # are being set seemingly randomly leading to odd results...
         # so set 0 seconds manually
@@ -136,7 +141,8 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
 
         ## CREATE TRAJECTORIES
 
-        feedback.pushInfo(f"Original point layer has {point_layer.featureCount()} features.")
+        total_features: int = point_layer.featureCount()
+        feedback.pushInfo(f"Original point layer has {total_features} features.")
 
         # Get min and max timestamps from the data
         min_timestamp, max_timestamp = ProcessingUtils.get_min_and_max_timestamps(point_layer, "timestamp")
@@ -157,6 +163,10 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
             req.setFilterExpression(filter_expression)
 
         filtered_layer = point_layer.materialize(req)
+
+        total_filtered_points: int = filtered_layer.featureCount()
+        feedback.pushInfo(f"Filtered {total_features - total_filtered_points} features out.")
+        feedback.pushInfo(f"Creating trajectories for {total_filtered_points} points out of {total_features}.")
 
         trajectory_layer = TrajectoryLayer(
             filtered_layer,
@@ -187,12 +197,6 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
         # CREATE GATES
-        line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
-
-        feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
-
-        gate_layer = GateLayer(line_layer, "name", "counts_negative", "counts_positive")
-
         gates = gate_layer.gates()
 
         for gate in gates:
