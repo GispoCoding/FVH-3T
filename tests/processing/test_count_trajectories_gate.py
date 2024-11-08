@@ -4,7 +4,7 @@ except ImportError:
     from qgis import processing
 
 import pytest
-from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
+from qgis.core import QgsApplication, QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QTimeZone, QVariant
 
 from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import TTTProvider
@@ -157,8 +157,8 @@ def input_point_layer_for_algorithm():
     return layer
 
 
-def test_count_trajectories(
-    qgis_app,
+def test_count_trajectories_gate(
+    qgis_app: QgsApplication,
     qgis_processing,  # noqa: ARG001
     input_point_layer_for_algorithm: QgsVectorLayer,
     input_gate_layer_for_algorithm: QgsVectorLayer,
@@ -342,3 +342,5 @@ def test_count_trajectories(
     assert case2traj1.geometry().asWkt() == "LineString (1 1.5, 0.5 1.5, -0.5 1.5, -1 2)"
     assert case2traj2.geometry().asWkt() == "LineString (-0.5 1, 0.5 2)"
     assert case2traj3.geometry().asWkt() == "LineString (1.5 0.5, 1.5 1.5)"
+
+    qgis_app.processingRegistry().removeProvider(provider.id())

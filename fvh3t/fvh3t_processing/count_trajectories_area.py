@@ -162,7 +162,7 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
         if filter_expression is None:
             filter_expression = ""
         else:
-            filter_expression += "AND "
+            filter_expression += " AND "
 
         filter_expression += f"(overlay_within('{area_vector_layer.id()}'))"
 
@@ -181,7 +181,6 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
             "size_y",
             "size_z",
             QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
-            filter_expression,
         )
 
         exported_traj_layer = trajectory_layer.as_line_layer()
