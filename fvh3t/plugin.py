@@ -116,6 +116,14 @@ class Plugin:
             parent=iface.mainWindow(),
             add_to_toolbar=True,
         )
+
+        self.add_action(
+            resources_path("icons", "add_area.png"),
+            text=tr("Create area layer"),
+            callback=self.create_area_layer,
+            parent=iface.mainWindow(),
+            add_to_toolbar=True,
+        )
         self.initProcessing()
 
     def onClosePlugin(self) -> None:  # noqa N802
@@ -131,5 +139,10 @@ class Plugin:
 
     def create_gate_layer(self) -> None:
         layer: QgsVectorLayer = QgisLayerUtils.create_gate_layer(QgsProject.instance().crs())
+
+        QgsProject.instance().addMapLayer(layer)
+
+    def create_area_layer(self) -> None:
+        layer: QgsVectorLayer = QgisLayerUtils.create_area_layer(QgsProject.instance().crs())
 
         QgsProject.instance().addMapLayer(layer)
