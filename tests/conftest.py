@@ -415,10 +415,12 @@ def four_point_area():
     return Area(
         QgsGeometry.fromPolygonXY(
             [
-                QgsPointXY(-0.5, -0.5),
-                QgsPointXY(0.5, -0.5),
-                QgsPointXY(0.5, 0.5),
-                QgsPointXY(-0.5, 0.5),
+                [
+                    QgsPointXY(-0.5, -0.5),
+                    QgsPointXY(0.5, -0.5),
+                    QgsPointXY(0.5, 0.5),
+                    QgsPointXY(-0.5, 0.5),
+                ]
             ]
         ),
         "polygon",
