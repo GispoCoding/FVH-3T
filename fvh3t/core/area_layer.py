@@ -72,7 +72,7 @@ class AreaLayer:
         polygon_layer.addAttribute(QgsField("interval_start", QVariant.DateTime))
         polygon_layer.addAttribute(QgsField("interval_end", QVariant.DateTime))
         polygon_layer.addAttribute(QgsField("vehicle_count", QVariant.Int))
-        polygon_layer.addAttribute(QgsField("speed_avg", QVariant.Double))
+        polygon_layer.addAttribute(QgsField("speed_avg (km/h)", QVariant.Double))
 
         fields = polygon_layer.fields()
 
