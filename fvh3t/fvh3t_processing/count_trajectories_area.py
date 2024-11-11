@@ -42,6 +42,7 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
     OUTPUT_TRAJECTORIES = "OUTPUT_TRAJECTORIES"
 
     area_dest_id: str | None = None
+    traj_dest_id: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -113,7 +114,7 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUTPUT_TRAJECTORIES,
-                description="Trajectories",
+                description="Trajectories - Areas",
                 type=QgsProcessing.SourceType.TypeVectorLine,
             )
         )
@@ -239,7 +240,7 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
             msg = "Trajectory layer is None."
             raise ValueError(msg)
 
-        (sink, traj_dest_id) = self.parameterAsSink(
+        (sink, self.traj_dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT_TRAJECTORIES,
             context,
@@ -279,7 +280,7 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
         for feature in exported_area_layer.getFeatures():
             sink.addFeature(feature, QgsFeatureSink.Flag.FastInsert)
 
-        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_AREAS: self.area_dest_id}
+        return {self.OUTPUT_TRAJECTORIES: self.traj_dest_id, self.OUTPUT_AREAS: self.area_dest_id}
 
     def postProcessAlgorithm(self, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> dict[str, Any]:  # noqa: N802
         if self.area_dest_id:

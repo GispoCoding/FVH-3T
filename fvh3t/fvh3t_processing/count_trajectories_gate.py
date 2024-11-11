@@ -34,6 +34,7 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
     OUTPUT_TRAJECTORIES = "OUTPUT_TRAJECTORIES"
 
     gate_dest_id: str | None = None
+    traj_dest_id: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -105,7 +106,7 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUTPUT_TRAJECTORIES,
-                description="Trajectories",
+                description="Trajectories - Gates",
                 type=QgsProcessing.TypeVectorLine,
             )
         )
@@ -184,7 +185,7 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
             msg = "Trajectory layer is None."
             raise ValueError(msg)
 
-        (sink, traj_dest_id) = self.parameterAsSink(
+        (sink, self.traj_dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT_TRAJECTORIES,
             context,
@@ -226,7 +227,7 @@ class CountTrajectoriesGate(QgsProcessingAlgorithm):
         for feature in exported_gate_layer.getFeatures():
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
-        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_GATES: self.gate_dest_id}
+        return {self.OUTPUT_TRAJECTORIES: self.traj_dest_id, self.OUTPUT_GATES: self.gate_dest_id}
 
     def postProcessAlgorithm(self, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> dict[str, Any]:  # noqa: N802
         if self.gate_dest_id:
