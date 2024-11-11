@@ -1,5 +1,6 @@
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsDefaultValue,
     QgsFeatureRenderer,
     QgsField,
     QgsFieldConstraints,
@@ -60,7 +61,20 @@ class QgisLayerUtils:
         layer.setCrs(crs)
 
         with edit(layer):
+            layer.addAttribute(QgsField("fid", QVariant.Int))
             layer.addAttribute(QgsField("name", QVariant.String))
+
+        layer.setFieldConstraint(0, QgsFieldConstraints.Constraint.ConstraintNotNull)
+
+        def_value = QgsDefaultValue(
+            """with_variable('feat_id', (maximum("fid") + 1), if (@feat_id is NULL, 1, @feat_id))"""
+        )
+        layer.setDefaultValueDefinition(0, def_value)
+
+        efc = layer.editFormConfig()
+        efc.setReadOnly(0)
+
+        layer.setEditFormConfig(efc)
 
         QgisLayerUtils.set_area_style(layer)
 

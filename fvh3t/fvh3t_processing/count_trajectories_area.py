@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+try:
+    import processing
+except ImportError:
+    from qgis import processing
+
 from typing import Any
 
 from qgis.core import (
     QgsFeatureRequest,
     QgsFeatureSink,
+    QgsField,
     QgsProcessing,
     QgsProcessingAlgorithm,
     QgsProcessingContext,
@@ -15,8 +21,10 @@ from qgis.core import (
     QgsProcessingParameterVectorLayer,
     QgsProcessingUtils,
     QgsUnitTypes,
+    QgsVectorLayer,
+    edit,
 )
-from qgis.PyQt.QtCore import QCoreApplication, QDateTime
+from qgis.PyQt.QtCore import QCoreApplication, QDateTime, QVariant
 
 from fvh3t.core.area_layer import AreaLayer
 from fvh3t.core.qgis_layer_utils import QgisLayerUtils
@@ -132,8 +140,11 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
 
         # create area layer already so it'll check for validity and terminate if
         # it's invalid
+
+        area_layer_fid_field = "fid"
+
         feedback.pushInfo(f"Area layer has {area_vector_layer.featureCount()} features.")
-        area_layer = AreaLayer(area_vector_layer, "name")
+        area_layer = AreaLayer(area_vector_layer, area_layer_fid_field, "name")
 
         # the datetime widget doesn't allow the user to set the seconds and they
         # are being set seemingly randomly leading to odd results...
@@ -173,9 +184,48 @@ class CountTrajectoriesArea(QgsProcessingAlgorithm):
         feedback.pushInfo(f"Filtered {total_features - total_filtered_points} features out.")
         feedback.pushInfo(f"Creating trajectories for {total_filtered_points} points out of {total_features}.")
 
+        # add area id to points to enable grouping them by area
+        join_result = processing.run(
+            "native:joinattributesbylocation",
+            {
+                "INPUT": filtered_points,
+                "PREDICATE": [0],
+                "JOIN": area_vector_layer,
+                "JOIN_FIELDS": ["fid"],
+                "METHOD": 1,
+                "DISCARD_NONMATCHING": False,
+                "PREFIX": "area_",
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )
+
+        filtered_and_grouped_points: QgsVectorLayer = join_result["OUTPUT"]
+
+        # convert id to string and concatenate the area_fid to it
+        # to group the points by id AND the area they're in
+        grouped_id_field = QgsField("grouped_id", QVariant.String)
+
+        with edit(filtered_and_grouped_points):
+            filtered_and_grouped_points.addAttribute(grouped_id_field)
+            id_field_idx: int = filtered_and_grouped_points.fields().indexOf("id")
+            area_id_field_idx: int = filtered_and_grouped_points.fields().indexOf("area_fid")
+            grouped_id_field_idx: int = filtered_and_grouped_points.fields().indexOf("grouped_id")
+
+            for feature in filtered_and_grouped_points.getFeatures():
+                idx: int = feature[id_field_idx]
+                area_id: int = feature[area_id_field_idx]
+
+                grouped_id = f"{area_id}_{idx}"
+
+                filtered_and_grouped_points.changeAttributeValue(
+                    feature.id(),
+                    grouped_id_field_idx,
+                    grouped_id,
+                )
+
         trajectory_layer = TrajectoryLayer(
-            filtered_points,
-            "id",
+            filtered_and_grouped_points,
+            "grouped_id",
             "timestamp",
             "size_x",
             "size_y",

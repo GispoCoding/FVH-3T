@@ -433,10 +433,11 @@ def qgis_area_polygon_layer():
 
     layer.startEditing()
 
+    layer.addAttribute(QgsField("fid", QVariant.Int))
     layer.addAttribute(QgsField("name", QVariant.String))
 
     area1 = QgsFeature(layer.fields())
-    area1.setAttributes(["area1"])
+    area1.setAttributes([1, "area1"])
     area1.setGeometry(
         QgsGeometry.fromPolygonXY(
             [
@@ -451,7 +452,7 @@ def qgis_area_polygon_layer():
     )
 
     area2 = QgsFeature(layer.fields())
-    area2.setAttributes(["area2"])
+    area2.setAttributes([2, "area2"])
     area2.setGeometry(
         QgsGeometry.fromPolygonXY(
             [

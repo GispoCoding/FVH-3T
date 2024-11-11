@@ -80,7 +80,7 @@ class GateLayer:
 
         fields = line_layer.fields()
 
-        for i, gate in enumerate(self.__gates):
+        for i, gate in enumerate(self.__gates, 1):
             feature = QgsFeature(fields)
 
             feature.setAttributes(

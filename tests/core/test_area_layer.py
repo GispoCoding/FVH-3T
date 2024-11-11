@@ -4,6 +4,7 @@ from fvh3t.core.area_layer import AreaLayer
 def test_area_layer_create_areas(qgis_area_polygon_layer):
     area_layer = AreaLayer(
         qgis_area_polygon_layer,
+        "fid",
         "name",
     )
 

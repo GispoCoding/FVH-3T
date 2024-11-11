@@ -25,10 +25,12 @@ class AreaLayer:
     def __init__(
         self,
         layer: QgsVectorLayer,
+        id_field: str,
         name_field: str,
     ) -> None:
         self.__layer: QgsVectorLayer = layer
         self.__name_field = name_field
+        self.__id_field = id_field
 
         if self.is_valid():
             self.__areas: tuple[Area, ...] = ()
@@ -74,7 +76,7 @@ class AreaLayer:
 
         fields = polygon_layer.fields()
 
-        for i, area in enumerate(self.__areas):
+        for i, area in enumerate(self.__areas, 1):
             feature = QgsFeature(fields)
 
             feature.setAttributes(
@@ -136,6 +138,10 @@ class AreaLayer:
 
         if not self.is_field_valid(self.__name_field, accepted_types=[QMetaType.Type.QString]):
             msg = "Name field either not found or of incorrect type."
+            raise InvalidLayerException(msg)
+
+        if not self.is_field_valid(self.__id_field, accepted_types=[]):
+            msg = "ID field not found."
             raise InvalidLayerException(msg)
 
         return True
