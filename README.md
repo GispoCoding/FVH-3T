@@ -91,7 +91,7 @@ Three algorithms are included.
   2. Line layer for the gates with additional calculated data
 
 #### Export to JSON
-* Exports the data of "Count trajectories (gates)" output 2 to a JSON file
+* Exports the gate layer created by "Count trajectories (gates)" to a JSON file
 * Output adheres to [this](https://bitbucket.org/conveqs/conveqs_platform_interface/src/master/json_schemas/history-detectors.json)
 JSON schema
 
