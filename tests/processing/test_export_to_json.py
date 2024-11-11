@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from qgis.core import QgsVectorLayer
 
 from fvh3t.fvh3t_processing.traffic_trajectory_toolkit_provider import TTTProvider
-from tests.processing.test_count_trajectories import (  # noqa: F401
+from tests.processing.test_count_trajectories_gate import (  # noqa: F401
     input_gate_layer_for_algorithm,
     input_point_layer_for_algorithm,
 )
@@ -37,7 +37,7 @@ def test_export_to_json(
     }
 
     result = processing.run(
-        "traffic_trajectory_toolkit:count_trajectories",
+        "traffic_trajectory_toolkit:count_trajectories_gate",
         params,
     )
 

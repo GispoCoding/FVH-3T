@@ -102,8 +102,6 @@ class TrajectoryLayer:
         self.__trajectories: tuple[Trajectory, ...] = ()
         self.create_trajectories(extra_filter_expression)
 
-        # TODO: should the class of traveler be handled here?
-
     def layer(self) -> QgsVectorLayer:
         return self.__layer
 
@@ -134,21 +132,27 @@ class TrajectoryLayer:
     def crs(self) -> QgsCoordinateReferenceSystem:
         return self.__layer.crs()
 
-    def create_trajectories(self, filter_expression: str | None) -> None:
+    def create_trajectories(self, extra_filter_expression: str | None) -> None:
         id_field_idx: int = self.__layer.fields().indexOf(self.__id_field)
         timestamp_field_idx: int = self.__layer.fields().indexOf(self.__timestamp_field)
         width_field_idx: int = self.__layer.fields().indexOf(self.__width_field)
         length_field_idx: int = self.__layer.fields().indexOf(self.__length_field)
         height_field_idx: int = self.__layer.fields().indexOf(self.__height_field)
 
+        id_is_string: bool = self.__layer.fields().field(id_field_idx).type() == QMetaType.Type.QString
+
         unique_ids: set[Any] = self.__layer.uniqueValues(id_field_idx)
 
         trajectories: list[Trajectory] = []
 
         for identifier in unique_ids:
-            expression_str = f'("{self.__id_field}" = {identifier})'
-            if filter_expression:
-                expression_str += f" and ({filter_expression})"
+            if id_is_string:
+                expression_str = f"(\"{self.__id_field}\" = '{identifier}')"
+            else:
+                expression_str = f'("{self.__id_field}" = {identifier})'
+
+            if extra_filter_expression:
+                expression_str += f" and ({extra_filter_expression})"
 
             expression = QgsExpression(expression_str)
             request = QgsFeatureRequest(expression)
@@ -207,7 +211,7 @@ class TrajectoryLayer:
 
         fields = line_layer.fields()
 
-        for i, trajectory in enumerate(self.__trajectories):
+        for i, trajectory in enumerate(self.__trajectories, 1):
             feature = QgsFeature(fields)
 
             min_size_x, min_size_y, min_size_z = trajectory.minimum_size()

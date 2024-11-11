@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from qgis.core import (
+    QgsFeatureRequest,
     QgsFeatureSink,
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -20,9 +21,10 @@ from qgis.PyQt.QtCore import QCoreApplication, QDateTime
 from fvh3t.core.gate_layer import GateLayer
 from fvh3t.core.qgis_layer_utils import QgisLayerUtils
 from fvh3t.core.trajectory_layer import TrajectoryLayer
+from fvh3t.fvh3t_processing.utils import ProcessingUtils
 
 
-class CountTrajectories(QgsProcessingAlgorithm):
+class CountTrajectoriesGate(QgsProcessingAlgorithm):
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_LINES = "INPUT_LINES"
     TRAVELER_CLASS = "TRAVELER_CLASS"
@@ -32,18 +34,19 @@ class CountTrajectories(QgsProcessingAlgorithm):
     OUTPUT_TRAJECTORIES = "OUTPUT_TRAJECTORIES"
 
     gate_dest_id: str | None = None
+    traj_dest_id: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
 
-        self._name = "count_trajectories"
-        self._display_name = "Count trajectories"
+        self._name = "count_trajectories_gate"
+        self._display_name = "Count trajectories (gates)"
 
     def tr(self, string) -> str:
         return QCoreApplication.translate("Processing", string)
 
     def createInstance(self):  # noqa N802
-        return CountTrajectories()
+        return CountTrajectoriesGate()
 
     def name(self) -> str:
         return self._name
@@ -103,7 +106,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUTPUT_TRAJECTORIES,
-                description="Trajectories",
+                description="Trajectories - Gates",
                 type=QgsProcessing.TypeVectorLine,
             )
         )
@@ -123,64 +126,57 @@ class CountTrajectories(QgsProcessingAlgorithm):
             feedback = QgsProcessingFeedback()
 
         point_layer = self.parameterAsVectorLayer(parameters, self.INPUT_POINTS, context)
-        traveler_class = self.parameterAsString(parameters, self.TRAVELER_CLASS, context)
+        traveler_class: str | None = self.parameterAsString(parameters, self.TRAVELER_CLASS, context)
         start_time: QDateTime = self.parameterAsDateTime(parameters, self.START_TIME, context)
         end_time: QDateTime = self.parameterAsDateTime(parameters, self.END_TIME, context)
+
+        # create gate layer already, so we check that it's valid
+        line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
+        feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
+        gate_layer = GateLayer(line_layer, "name", "counts_negative", "counts_positive")
 
         # the datetime widget doesn't allow the user to set the seconds and they
         # are being set seemingly randomly leading to odd results...
         # so set 0 seconds manually
-
-        zero_s_start_time = start_time.time()
-        zero_s_start_time.setHMS(zero_s_start_time.hour(), zero_s_start_time.minute(), 0)
-        start_time.setTime(zero_s_start_time)
-
-        zero_s_end_time = end_time.time()
-        zero_s_end_time.setHMS(zero_s_end_time.hour(), zero_s_end_time.minute(), 0)
-        end_time.setTime(zero_s_end_time)
+        ProcessingUtils.normalize_datetimes(start_time, end_time)
 
         ## CREATE TRAJECTORIES
 
-        feedback.pushInfo(f"Original point layer has {point_layer.featureCount()} features.")
+        total_features: int = point_layer.featureCount()
+        feedback.pushInfo(f"Original point layer has {total_features} features.")
 
         # Get min and max timestamps from the data
-        timestamp_field_id = point_layer.fields().indexOf("timestamp")
-        min_timestamp, max_timestamp = point_layer.minimumAndMaximumValue(timestamp_field_id)
+        min_timestamp, max_timestamp = ProcessingUtils.get_min_and_max_timestamps(point_layer, "timestamp")
+        start_time_unix, end_time_unix = ProcessingUtils.get_start_and_end_timestamps(
+            start_time, end_time, min_timestamp, max_timestamp
+        )
 
-        if min_timestamp is None or max_timestamp is None:
-            msg = "No valid timestamps found in the point layer."
-            raise ValueError(msg)
+        filter_expression: str | None = ProcessingUtils.get_filter_expression_time_and_class(
+            start_time_unix,
+            end_time_unix,
+            traveler_class,
+            min_timestamp,
+            max_timestamp,
+        )
 
-        # Check if start and end times are empty. If yes, use min and max timestamps. If not, convert to unix time.
-        start_time_unix = start_time.toMSecsSinceEpoch() if start_time.isValid() else min_timestamp
-        end_time_unix = end_time.toMSecsSinceEpoch() if end_time.isValid() else max_timestamp
+        req = QgsFeatureRequest()
+        if filter_expression:
+            req.setFilterExpression(filter_expression)
 
-        # Check that the set start and end times are in data's range
-        if not (min_timestamp <= start_time_unix <= max_timestamp) or not (
-            min_timestamp <= end_time_unix <= max_timestamp
-        ):
-            msg = "Set start and/or end timestamps are out of data's range."
-            raise ValueError(msg)
+        filtered_layer = point_layer.materialize(req)
 
-        # If start or end time was given, filter the nodes outside the time range
-        filter_expression: str | None = None
-        if start_time_unix != min_timestamp or end_time_unix != max_timestamp:
-            filter_expression = f'"timestamp" BETWEEN {start_time_unix} AND {end_time_unix}'
-        if not filter_expression:
-            if traveler_class:
-                filter_expression = f"\"label\" = '{traveler_class}'"
-        elif traveler_class:
-            filter_expression += f" AND \"label\" = '{traveler_class}'"
+        total_filtered_points: int = filtered_layer.featureCount()
+        feedback.pushInfo(f"Filtered {total_features - total_filtered_points} features out.")
+        feedback.pushInfo(f"Creating trajectories for {total_filtered_points} points out of {total_features}.")
 
         trajectory_layer = TrajectoryLayer(
-            point_layer,
+            filtered_layer,
             "id",
             "timestamp",
             "size_x",
             "size_y",
             "size_z",
             QgsUnitTypes.TemporalUnit.TemporalMilliseconds,
-            filter_expression,
         )
 
         exported_traj_layer = trajectory_layer.as_line_layer()
@@ -189,7 +185,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
             msg = "Trajectory layer is None."
             raise ValueError(msg)
 
-        (sink, traj_dest_id) = self.parameterAsSink(
+        (sink, self.traj_dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT_TRAJECTORIES,
             context,
@@ -202,12 +198,6 @@ class CountTrajectories(QgsProcessingAlgorithm):
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
         # CREATE GATES
-        line_layer = self.parameterAsVectorLayer(parameters, self.INPUT_LINES, context)
-
-        feedback.pushInfo(f"Line layer has {line_layer.featureCount()} features.")
-
-        gate_layer = GateLayer(line_layer, "name", "counts_negative", "counts_positive")
-
         gates = gate_layer.gates()
 
         for gate in gates:
@@ -237,7 +227,7 @@ class CountTrajectories(QgsProcessingAlgorithm):
         for feature in exported_gate_layer.getFeatures():
             sink.addFeature(feature, QgsFeatureSink.FastInsert)
 
-        return {self.OUTPUT_TRAJECTORIES: traj_dest_id, self.OUTPUT_GATES: self.gate_dest_id}
+        return {self.OUTPUT_TRAJECTORIES: self.traj_dest_id, self.OUTPUT_GATES: self.gate_dest_id}
 
     def postProcessAlgorithm(self, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> dict[str, Any]:  # noqa: N802
         if self.gate_dest_id:
