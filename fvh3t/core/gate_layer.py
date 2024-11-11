@@ -87,14 +87,14 @@ class GateLayer:
                 [
                     i,
                     gate.name(),
-                    traveler_class,
+                    traveler_class if traveler_class else "all",
                     start_time,
                     end_time,
                     gate.counts_negative(),
                     gate.counts_positive(),
                     gate.trajectory_count(),
-                    gate.average_speed(),
-                    gate.average_acceleration(),
+                    round(gate.average_speed(), 2),
+                    round(gate.average_acceleration(), 2),
                 ]
             )
             feature.setGeometry(gate.geometry())

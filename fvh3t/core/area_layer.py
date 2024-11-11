@@ -83,11 +83,11 @@ class AreaLayer:
                 [
                     i,
                     area.name(),
-                    traveler_class,
+                    traveler_class if traveler_class else "all",
                     start_time,
                     end_time,
                     area.trajectory_count(),
-                    area.average_speed(),
+                    round(area.average_speed(), 2),
                 ]
             )
             feature.setGeometry(area.geometry())
