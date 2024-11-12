@@ -57,8 +57,8 @@ def test_trajectory_layer_create_line_layer(qgis_point_layer):
     assert feat1.geometry().asWkt() == "LineString (0 0, 1 0, 2 0)"
     assert feat2.geometry().asWkt() == "LineString (5 1, 5 2, 5 3)"
 
-    assert feat1.attribute("average_speed") == 36.0
-    assert feat2.attribute("average_speed") == 36.0
+    assert feat1.attribute("average_speed (km/h)") == 36.0
+    assert feat2.attribute("average_speed (km/h)") == 36.0
 
 
 def test_trajectory_layer_node_ordering(qgis_point_layer_non_ordered):
