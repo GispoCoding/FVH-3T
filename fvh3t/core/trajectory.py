@@ -177,3 +177,14 @@ class Trajectory:
         )
 
         return round(total_width / n_nodes, 2), round(total_length / n_nodes, 2), round(total_height / n_nodes, 2)
+
+    def get_timestamp(self, node: TrajectoryNode) -> tuple[int, int, int, int, int, int]:
+        start_timestamp = node.timestamp
+        return (
+            start_timestamp.year,
+            start_timestamp.month,
+            start_timestamp.day,
+            start_timestamp.hour,
+            start_timestamp.minute,
+            start_timestamp.second,
+        )
