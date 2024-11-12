@@ -18,7 +18,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsWkbTypes,
 )
-from qgis.PyQt.QtCore import QMetaType, QVariant
+from qgis.PyQt.QtCore import QDateTime, QMetaType, QVariant
 
 from fvh3t.core.exceptions import InvalidFeatureException, InvalidLayerException
 from fvh3t.core.trajectory import Trajectory, TrajectoryNode
@@ -198,6 +198,7 @@ class TrajectoryLayer:
         line_layer.addAttribute(QgsField("average_speed (km/h)", QVariant.Double))
         line_layer.addAttribute(QgsField("maximum_speed (km/h)", QVariant.Double))
         line_layer.addAttribute(QgsField("length (m)", QVariant.Double))
+        line_layer.addAttribute(QgsField("start", QVariant.DateTime))
         line_layer.addAttribute(QgsField("duration (s)", QVariant.Double))
         line_layer.addAttribute(QgsField("minimum_size_x (m)", QVariant.Double))
         line_layer.addAttribute(QgsField("minimum_size_y (m)", QVariant.Double))
@@ -214,6 +215,9 @@ class TrajectoryLayer:
         for i, trajectory in enumerate(self.__trajectories, 1):
             feature = QgsFeature(fields)
 
+            first_traj_node = trajectory.nodes()[0]
+            year, month, day, hours, minutes, seconds = trajectory.get_timestamp(first_traj_node)
+            start = QDateTime(year, month, day, hours, minutes, seconds)
             min_size_x, min_size_y, min_size_z = trajectory.minimum_size()
             max_size_x, max_size_y, max_size_z = trajectory.maximum_size()
             avg_size_x, avg_size_y, avg_size_z = trajectory.average_size()
@@ -224,6 +228,7 @@ class TrajectoryLayer:
                     trajectory.average_speed(),
                     trajectory.maximum_speed(),
                     trajectory.length(),
+                    start,
                     trajectory.duration().total_seconds(),
                     min_size_x,
                     min_size_y,
