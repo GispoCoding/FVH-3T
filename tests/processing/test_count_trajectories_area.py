@@ -152,8 +152,8 @@ def test_count_trajectories_area(
     assert area1.attribute("vehicle_count") == 1
     assert area2.attribute("vehicle_count") == 2
 
-    assert area1.attribute("speed_avg") == 0.9
-    assert round(area2.attribute("speed_avg"), 2) == 1.54
+    assert area1.attribute("speed_avg (km/h)") == 0.9
+    assert round(area2.attribute("speed_avg (km/h)"), 2) == 1.54
 
     ### TEST CASE 2 - FILTER BY TIME
 

@@ -216,89 +216,89 @@ def test_count_trajectories_gate(
     assert traj5.geometry().asWkt() == "LineString (1 0.5, 0 -0.5)"
     assert traj6.geometry().asWkt() == "LineString (0.5 -0.5, 0 0.5)"
 
-    assert traj1.attribute("average_speed") == 2.65
-    assert traj1.attribute("maximum_speed") == 3.6
-    assert traj1.attribute("length") == 2.21
-    assert traj1.attribute("duration") == 3
-    assert traj1.attribute("minimum_size_x") == 1
-    assert traj1.attribute("minimum_size_y") == 1
-    assert traj1.attribute("minimum_size_z") == 1
-    assert traj1.attribute("maximum_size_x") == 2
-    assert traj1.attribute("maximum_size_y") == 2
-    assert traj1.attribute("maximum_size_z") == 2
-    assert traj1.attribute("average_size_x") == 1.5
-    assert traj1.attribute("average_size_y") == 1.5
-    assert traj1.attribute("average_size_z") == 1.5
+    assert traj1.attribute("average_speed (km/h)") == 2.65
+    assert traj1.attribute("maximum_speed (km/h)") == 3.6
+    assert traj1.attribute("length (m)") == 2.21
+    assert traj1.attribute("duration (s)") == 3
+    assert traj1.attribute("minimum_size_x (m)") == 1
+    assert traj1.attribute("minimum_size_y (m)") == 1
+    assert traj1.attribute("minimum_size_z (m)") == 1
+    assert traj1.attribute("maximum_size_x (m)") == 2
+    assert traj1.attribute("maximum_size_y (m)") == 2
+    assert traj1.attribute("maximum_size_z (m)") == 2
+    assert traj1.attribute("average_size_x (m)") == 1.5
+    assert traj1.attribute("average_size_y (m)") == 1.5
+    assert traj1.attribute("average_size_z (m)") == 1.5
 
-    assert traj2.attribute("average_speed") == 5.09
-    assert traj2.attribute("maximum_speed") == 5.09
-    assert traj2.attribute("length") == 1.41
-    assert traj2.attribute("duration") == 1
-    assert traj2.attribute("minimum_size_x") == 1
-    assert traj2.attribute("minimum_size_y") == 1
-    assert traj2.attribute("minimum_size_z") == 1
-    assert traj2.attribute("maximum_size_x") == 2
-    assert traj2.attribute("maximum_size_y") == 2
-    assert traj2.attribute("maximum_size_z") == 2
-    assert traj2.attribute("average_size_x") == 1.5
-    assert traj2.attribute("average_size_y") == 1.5
-    assert traj2.attribute("average_size_z") == 1.5
+    assert traj2.attribute("average_speed (km/h)") == 5.09
+    assert traj2.attribute("maximum_speed (km/h)") == 5.09
+    assert traj2.attribute("length (m)") == 1.41
+    assert traj2.attribute("duration (s)") == 1
+    assert traj2.attribute("minimum_size_x (m)") == 1
+    assert traj2.attribute("minimum_size_y (m)") == 1
+    assert traj2.attribute("minimum_size_z (m)") == 1
+    assert traj2.attribute("maximum_size_x (m)") == 2
+    assert traj2.attribute("maximum_size_y (m)") == 2
+    assert traj2.attribute("maximum_size_z (m)") == 2
+    assert traj2.attribute("average_size_x (m)") == 1.5
+    assert traj2.attribute("average_size_y (m)") == 1.5
+    assert traj2.attribute("average_size_z (m)") == 1.5
 
-    assert traj3.attribute("average_speed") == 3.6
-    assert traj3.attribute("maximum_speed") == 3.6
-    assert traj3.attribute("length") == 1
-    assert traj3.attribute("duration") == 1
-    assert traj3.attribute("minimum_size_x") == 1
-    assert traj3.attribute("minimum_size_y") == 1
-    assert traj3.attribute("minimum_size_z") == 1
-    assert traj3.attribute("maximum_size_x") == 2
-    assert traj3.attribute("maximum_size_y") == 2
-    assert traj3.attribute("maximum_size_z") == 2
-    assert traj3.attribute("average_size_x") == 1.5
-    assert traj3.attribute("average_size_y") == 1.5
-    assert traj3.attribute("average_size_z") == 1.5
+    assert traj3.attribute("average_speed (km/h)") == 3.6
+    assert traj3.attribute("maximum_speed (km/h)") == 3.6
+    assert traj3.attribute("length (m)") == 1
+    assert traj3.attribute("duration (s)") == 1
+    assert traj3.attribute("minimum_size_x (m)") == 1
+    assert traj3.attribute("minimum_size_y (m)") == 1
+    assert traj3.attribute("minimum_size_z (m)") == 1
+    assert traj3.attribute("maximum_size_x (m)") == 2
+    assert traj3.attribute("maximum_size_y (m)") == 2
+    assert traj3.attribute("maximum_size_z (m)") == 2
+    assert traj3.attribute("average_size_x (m)") == 1.5
+    assert traj3.attribute("average_size_y (m)") == 1.5
+    assert traj3.attribute("average_size_z (m)") == 1.5
 
-    assert traj4.attribute("average_speed") == 5.09
-    assert traj4.attribute("maximum_speed") == 5.09
-    assert traj4.attribute("length") == 1.41
-    assert traj4.attribute("duration") == 1
-    assert traj4.attribute("minimum_size_x") == 1
-    assert traj4.attribute("minimum_size_y") == 1
-    assert traj4.attribute("minimum_size_z") == 1
-    assert traj4.attribute("maximum_size_x") == 2
-    assert traj4.attribute("maximum_size_y") == 2
-    assert traj4.attribute("maximum_size_z") == 2
-    assert traj4.attribute("average_size_x") == 1.5
-    assert traj4.attribute("average_size_y") == 1.5
-    assert traj4.attribute("average_size_z") == 1.5
+    assert traj4.attribute("average_speed (km/h)") == 5.09
+    assert traj4.attribute("maximum_speed (km/h)") == 5.09
+    assert traj4.attribute("length (m)") == 1.41
+    assert traj4.attribute("duration (s)") == 1
+    assert traj4.attribute("minimum_size_x (m)") == 1
+    assert traj4.attribute("minimum_size_y (m)") == 1
+    assert traj4.attribute("minimum_size_z (m)") == 1
+    assert traj4.attribute("maximum_size_x (m)") == 2
+    assert traj4.attribute("maximum_size_y (m)") == 2
+    assert traj4.attribute("maximum_size_z (m)") == 2
+    assert traj4.attribute("average_size_x (m)") == 1.5
+    assert traj4.attribute("average_size_y (m)") == 1.5
+    assert traj4.attribute("average_size_z (m)") == 1.5
 
-    assert traj5.attribute("average_speed") == 5.09
-    assert traj5.attribute("maximum_speed") == 5.09
-    assert traj5.attribute("length") == 1.41
-    assert traj5.attribute("duration") == 1
-    assert traj5.attribute("minimum_size_x") == 1
-    assert traj5.attribute("minimum_size_y") == 1
-    assert traj5.attribute("minimum_size_z") == 1
-    assert traj5.attribute("maximum_size_x") == 2
-    assert traj5.attribute("maximum_size_y") == 2
-    assert traj5.attribute("maximum_size_z") == 2
-    assert traj5.attribute("average_size_x") == 1.5
-    assert traj5.attribute("average_size_y") == 1.5
-    assert traj5.attribute("average_size_z") == 1.5
+    assert traj5.attribute("average_speed (km/h)") == 5.09
+    assert traj5.attribute("maximum_speed (km/h)") == 5.09
+    assert traj5.attribute("length (m)") == 1.41
+    assert traj5.attribute("duration (s)") == 1
+    assert traj5.attribute("minimum_size_x (m)") == 1
+    assert traj5.attribute("minimum_size_y (m)") == 1
+    assert traj5.attribute("minimum_size_z (m)") == 1
+    assert traj5.attribute("maximum_size_x (m)") == 2
+    assert traj5.attribute("maximum_size_y (m)") == 2
+    assert traj5.attribute("maximum_size_z (m)") == 2
+    assert traj5.attribute("average_size_x (m)") == 1.5
+    assert traj5.attribute("average_size_y (m)") == 1.5
+    assert traj5.attribute("average_size_z (m)") == 1.5
 
-    assert traj6.attribute("average_speed") == 4.02
-    assert traj6.attribute("maximum_speed") == 4.02
-    assert traj6.attribute("length") == 1.12
-    assert traj6.attribute("duration") == 1
-    assert traj6.attribute("minimum_size_x") == 1
-    assert traj6.attribute("minimum_size_y") == 1
-    assert traj6.attribute("minimum_size_z") == 1
-    assert traj6.attribute("maximum_size_x") == 2
-    assert traj6.attribute("maximum_size_y") == 2
-    assert traj6.attribute("maximum_size_z") == 2
-    assert traj6.attribute("average_size_x") == 1.5
-    assert traj6.attribute("average_size_y") == 1.5
-    assert traj6.attribute("average_size_z") == 1.5
+    assert traj6.attribute("average_speed (km/h)") == 4.02
+    assert traj6.attribute("maximum_speed (km/h)") == 4.02
+    assert traj6.attribute("length (m)") == 1.12
+    assert traj6.attribute("duration (s)") == 1
+    assert traj6.attribute("minimum_size_x (m)") == 1
+    assert traj6.attribute("minimum_size_y (m)") == 1
+    assert traj6.attribute("minimum_size_z (m)") == 1
+    assert traj6.attribute("maximum_size_x (m)") == 2
+    assert traj6.attribute("maximum_size_y (m)") == 2
+    assert traj6.attribute("maximum_size_z (m)") == 2
+    assert traj6.attribute("average_size_x (m)") == 1.5
+    assert traj6.attribute("average_size_y (m)") == 1.5
+    assert traj6.attribute("average_size_z (m)") == 1.5
 
     ### TEST CASE 2 - FILTER BY TIME
 
