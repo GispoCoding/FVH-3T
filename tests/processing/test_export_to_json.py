@@ -68,7 +68,7 @@ def test_export_to_json(
         "interval_start",
         "interval_end",
         "vehicle_count",
-        "speed_avg (km/h)",
-        "acceleration_avg (m/s^2)",
+        "speed_avg",
+        "acceleration_avg",
     }
     assert set(data.keys()) == keys
