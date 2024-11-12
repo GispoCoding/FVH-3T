@@ -79,6 +79,9 @@ class ExportToJSON(QgsProcessingAlgorithm):
 
             for field_name, field_value in zip(gate_layer.fields().names(), feature.attributes()):
                 if field_name not in fields_to_exclude:
+                    if field_name in ("vehicle_count_negative", "vehicle_count_positive"):
+                        continue
+
                     if field_name == "name":
                         field_name = "channel"  # noqa: PLW2901
 
