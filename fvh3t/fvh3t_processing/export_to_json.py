@@ -85,6 +85,12 @@ class ExportToJSON(QgsProcessingAlgorithm):
                     if field_name == "name":
                         field_name = "channel"  # noqa: PLW2901
 
+                    if field_name == "speed_avg (km/h)":
+                        field_name = "speed_avg"  # noqa: PLW2901
+
+                    if field_name == "acceleration_avg (m/s^2)":
+                        field_name = "acceleration_avg"  # noqa: PLW2901
+
                     # Convert speed km/h -> m/s
                     value = field_value / 3.6 if field_name == "speed_avg" else field_value
 
