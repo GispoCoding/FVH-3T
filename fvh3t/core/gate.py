@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsPointXY, QgsWkbTypes
 
-from fvh3t.core.gate_segment import GateSegment
+from fvh3t.core.gate_segment import GateSegment, RelativeDirection
 
 
 class Gate:
@@ -34,6 +34,8 @@ class Gate:
 
         self.__geom: QgsGeometry = geom
         self.__trajectory_count: int = 0
+        self.__trajectory_count_negative: int = 0
+        self.__trajectory_count_positive: int = 0
 
         self.__name: str = name
 
@@ -64,6 +66,12 @@ class Gate:
 
     def trajectory_count(self) -> int:
         return self.__trajectory_count
+
+    def trajectory_count_negative(self) -> int:
+        return self.__trajectory_count_negative
+
+    def trajectory_count_positive(self) -> int:
+        return self.__trajectory_count_positive
 
     def average_speed(self) -> float:
         return self.__average_speed
@@ -117,13 +125,18 @@ class Gate:
                         # the same gate multiple times is not handled
 
                         previous_traj_seg: TrajectorySegment | None = traj_segments[i - 1] if i > 0 else None
-                        crosses: bool = gate_segment.trajectory_segment_crosses(
+                        crosses: bool | RelativeDirection = gate_segment.trajectory_segment_crosses(
                             traj_seg,
                             previous_traj_seg,
                             counts_negative=self.__counts_negative,
                             counts_positive=self.__counts_positive,
                         )
-                        if crosses:
+                        if isinstance(crosses, RelativeDirection):
+                            if crosses == RelativeDirection.LEFT:
+                                self.__trajectory_count_negative += 1
+                            elif crosses == RelativeDirection.RIGHT:
+                                self.__trajectory_count_positive += 1
+                        if crosses is not False:
                             self.__trajectory_count += 1
                             current_speed = traj_seg.speed(crs)
                             speed += current_speed

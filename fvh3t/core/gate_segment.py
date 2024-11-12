@@ -42,7 +42,7 @@ class GateSegment:
         *,
         counts_negative: bool,
         counts_positive: bool,
-    ) -> bool:
+    ) -> bool | RelativeDirection:
         crosses = self.__geom.crosses(traj_seg.as_geometry())
 
         if not crosses:
@@ -59,15 +59,15 @@ class GateSegment:
 
             return False
 
-        if counts_negative and counts_positive:
-            return True
-
         crosses_from: RelativeDirection = self.trajectory_segment_crosses_from(traj_seg)
 
         if counts_negative and crosses_from == RelativeDirection.LEFT:
-            return True
+            return RelativeDirection.RIGHT
 
-        return counts_positive and crosses_from == RelativeDirection.RIGHT
+        if counts_positive and crosses_from == RelativeDirection.RIGHT:
+            return RelativeDirection.LEFT
+
+        return bool(counts_negative and counts_positive)
 
     def trajectory_segment_crosses_from(self, segment: TrajectorySegment) -> RelativeDirection:
         """
