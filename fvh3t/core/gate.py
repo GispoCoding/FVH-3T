@@ -133,9 +133,9 @@ class Gate:
                         )
                         if isinstance(crosses, RelativeDirection):
                             if crosses == RelativeDirection.LEFT:
-                                self.__trajectory_count_negative += 1
-                            elif crosses == RelativeDirection.RIGHT:
                                 self.__trajectory_count_positive += 1
+                            elif crosses == RelativeDirection.RIGHT:
+                                self.__trajectory_count_negative += 1
                         if crosses is not False:
                             self.__trajectory_count += 1
                             current_speed = traj_seg.speed(crs)
