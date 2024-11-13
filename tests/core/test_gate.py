@@ -30,15 +30,23 @@ def test_trajectory_count(qgis_point_layer_for_gate_count):
 
     gate1.count_trajectories_from_layer(traj_layer)
     assert gate1.trajectory_count() == 1
+    assert gate1.trajectory_count_negative() == 0
+    assert gate1.trajectory_count_positive() == 1
 
     gate2.count_trajectories_from_layer(traj_layer)
     assert gate2.trajectory_count() == 1
+    assert gate2.trajectory_count_negative() == 1
+    assert gate2.trajectory_count_positive() == 0
 
     gate3.count_trajectories_from_layer(traj_layer)
     assert gate3.trajectory_count() == 2
+    assert gate3.trajectory_count_negative() == 1
+    assert gate3.trajectory_count_positive() == 1
 
     gate4.count_trajectories_from_layer(traj_layer)
     assert gate4.trajectory_count() == 0
+    assert gate4.trajectory_count_negative() == 0
+    assert gate4.trajectory_count_positive() == 0
 
 
 def test_geometry(two_point_gate, three_point_gate):
