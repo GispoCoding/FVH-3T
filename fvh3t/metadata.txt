@@ -2,9 +2,9 @@
 name=Traffic Trajectory Toolkit
 description=Plugin for analyzing traffic trajectory data
 about=
-version=0.1.0
-qgisMinimumVersion=3.16
-author=
+version=0.2.2
+qgisMinimumVersion=3.28
+author=Gispo Ltd.
 email=
 changelog=
 tags=
