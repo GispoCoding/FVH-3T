@@ -93,7 +93,16 @@ Three algorithms are included.
 #### Export to JSON
 * Exports the gate layer created by "Count trajectories (gates)" to a JSON file
 * Output adheres to [this](https://bitbucket.org/conveqs/conveqs_platform_interface/src/master/json_schemas/history-detectors.json)
-JSON schema
+JSON schema from [Conveqs](https://bitbucket.org/conveqs/conveqs_platform_interface/src/master/)
+
+## Trajectory datasets
+
+Plugin supports creating trajectories from any point datasets that QGIS imports. Points need attributes at least for timestamp, trajetory ID and vehicle classification.
+
+Following sample dataset is available: https://github.com/GispoCoding/FVH-3T/releases/tag/data_sample
+
+Full "Helsinki Esplanadi roadside lidar data capture pilot"-dataset is available from [Flow Analytics AGC](https://www.flow-analytics.io/) portal https://flow-portal.com/ Three fixed roadside lidars captured the traffic over 6 month perioid March - August 2024. More information from [Forum Virium Helsinki](https://forumvirium.fi/) Smart mobility team.
+
 
 ## Development
 
